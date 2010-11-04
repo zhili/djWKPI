@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Django jQuery Autocomplete</title>
+<link rel="stylesheet" type="text/css" href="/polls/site_media/Autocomplete/jquery.autocomplete.css"/>
+<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script>
+<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.autocomplete.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+	// function findValueCallback(event, data, formatted) {
+	// 	$("<li>").html( !data ? "No match!" : "Selected: " + formatted).appendTo("#result");
+	// }
+	// 
+	// function formatItem(row) {
+	// 	return row[0] + " <strong>decode</strong>" + row[1] ; 
+	// }
+	// function formatResult(row) {
+	// 	return row[0].replace(/(<.+?>)/gi, '');
+	// }
+	var url = ".";
+	$("#suggest").autocomplete(url, {
+		limit : 10 
+		// width: 300,
+		// multiple: false,multipleSeparator: ' ',
+		// matchContains: true,
+		// formatItem: formatItem, 
+		// formatResult: formatResult 
+	});
+	// $("#suggest").result(function(event, data, formatted) {
+	// 	var hidden = $(this).parent().next().find(">:input");
+	// 	hidden.val( (hidden.val() ? hidden.val() + ";" : hidden.val()) + data[1]);
+	// });
+});
+
+</script>
+
+</head>
+<body>
+	<input type="text" class="ac_input" id="suggest" />
+	  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
+	    <ul style="overflow: auto; max-height: 180px;">
+	       <li class="ac_even"></li>
+	       <li class="ac_odd"></li>
+	    </ul>
+	  </div>
+</body>
+</html>

@@ -131,3 +131,19 @@ def chart_data(request):
         chart.add_element(l)
         ix += 1
     return HttpResponse(chart.render())
+
+def worst_dcr_cells(request):
+	kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'dcr':'K19_a*1.0 / K19_b'}).order_by('-dcr')[:10]
+	print kpi_list
+	return render_to_response('worst_cells.html', {'kpi_list':kpi_list})
+	
+	
+from django.db.models import Q
+
+def tag_autocomplete(request):
+    if request.GET.has_key('q'):
+        q_str = request.GET['q']
+        if len(q_str)>0:
+            tags = (Cell.objects.filter(Q (rnc_id__icontains=request.GET['q']) | Q (cell_name__icontains=request.GET['q'])))[:10] 
+            return HttpResponse('\n'.join(tag.cell_name for tag in tags))
+    return render_to_response('search.html')

@@ -1,0 +1,11 @@
+<html>
+<head>
+	<title>Worst Cells</title>
+</head> 
+<body> 
+	<h1>Top10 DCR Cells</h1> 
+	<ul>{% for kpi in kpi_list %} 
+		<li>{{ kpi.ucell.id }} {{ kpi.K19_a }} {{ kpi.K19_b }}</li> 
+	{% endfor %} </ul>
+</body>
+</html>
