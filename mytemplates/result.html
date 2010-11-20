@@ -1,9 +1,27 @@
-<h1>{{ poll.question }}</h1>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<ul>
-{% for choice in poll.choice_set.all %}
-    <li>{{ choice.choice }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-{% endfor %}
-</ul>
-
-<a href="/polls/{{ poll.id }}/">Vote again?</a>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Ucell KPI App</title>
+	<meta name="author" content="Pradeep Gowda">
+	<!-- Date: 2009-04-15 -->  
+	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
+    <script type="text/javascript">
+    	swfobject.embedSWF(
+    	  "/polls/site_media/open-flash-chart.swf", "chart_total",
+    	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
+    	  {"data-file":"/polls/{{cell_name}}/data/"} );
+    	swfobject.embedSWF(
+    	  "/polls/site_media/open-flash-chart.swf", "chart_dropcall",
+    	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
+    	  {"data-file":"/polls/{{cell_name}}/1/data/"} );
+    </script>
+</head>
+<body>
+  <h1>{{cell_name}} kpi</h1>
+  <div class="chart" id="chart_total"></div>
+  <div class="chart" id="chart_dropcall"></div>
+</body>
+</html>

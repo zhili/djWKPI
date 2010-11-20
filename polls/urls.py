@@ -20,9 +20,12 @@ urlpatterns = patterns('',
     # (r'^(?P<poll_id>\d+)/results/$', 'polls.views.results'),
     # (r'^(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
 
-    (r'^data/$', 'polls.views.chart_data'),
+    (r'^(?P<cellname>\w+)/data/$', 'polls.views.chart_data'),
+    (r'^(?P<cellname>\w+)/(?P<chart_id>\d+)/data/$', 'polls.views.chart_by_id'),
     (r'^worst-cells/$', 'polls.views.worst_dcr_cells'),
-    (r'^search/$', 'polls.views.tag_autocomplete')
+    (r'^search/$', 'polls.views.tag_autocomplete'),
+    (r'^results/(?P<cellname>\w+)$', 'polls.views.results'),
+    # (r'^celldetail/$', 'polls.views.cellDetail')
 )
 
 if settings.DEBUG:

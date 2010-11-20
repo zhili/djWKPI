@@ -106,10 +106,42 @@ def upload(request):
 
 # report = staff_member_required(upload)
 from pyofc2  import * 
+import time
+def chart_by_id(request, cellname, chart_id):
+    print chart_id
+    my_cell = Cell.objects.get(cell_name=cellname)
+    t = title(text=my_cell.cell_name)
+    chart = open_flash_chart()
+    chart.title = t
+    b = bar()
+    y = y_axis()
+    y.min, y.max, y.steps = 0, 1, 0.1
+    chart.y_axis = y
+    
+    x = x_axis()
+    xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
+    lbls = []
+    for item in my_cell.kpi_set.all():
+	    lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+    
+    xlbls.labels = lbls 
+    x.labels = xlbls
+    chart.x_axis = x
+    
+    # l.halo_size = 10
+    b.width = 4
+    # l.dot_size = 4
+    b.tip = 'value: #val#'
+    b.text = 'AMR Traffic'
+    b.values = [item.K01 for item in my_cell.kpi_set.all()]
+    chart.add_element(b)
 
-def chart_data(request):
+    return HttpResponse(chart.render())
 
-    my_cell = Cell.objects.get(pk=1)
+def chart_data(request, cellname):
+
+    # my_cell = Cell.objects.get(pk=1)
+    my_cell = Cell.objects.get(cell_name=cellname)
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
@@ -125,10 +157,19 @@ def chart_data(request):
     ix = 0
     for acell in my_cell.kpi_set.all():
 	    # print acell.ucell.cell_name, acell.date, acell.K01
-        l = line()
+        l = line_hollow()
+        # l.halo_size = 10
+        l.width = 4
+        # l.dot_size = 4
+        l.tip = 'value: #val#'
+        l.text = 'purge line'
         l.colour = line_colors[ix]
         l.values = [acell.K01,acell.K02,acell.K03, acell.K04, acell.K05]
         chart.add_element(l)
+        # b1 = bar_filled(colour='#E2D66A')
+        # b1.values = [acell.K01,acell.K02,acell.K03, acell.K04, acell.K05]
+        # b1.outline_colour = '#577261'   
+        # chart.add_element(b1)
         ix += 1
     return HttpResponse(chart.render())
 
@@ -146,4 +187,18 @@ def tag_autocomplete(request):
         if len(q_str)>0:
             tags = (Cell.objects.filter(Q (rnc_id__icontains=request.GET['q']) | Q (cell_name__icontains=request.GET['q'])))[:10] 
             return HttpResponse('\n'.join(tag.cell_name for tag in tags))
-    return render_to_response('search.html')
+    if request.method == 'POST': 
+        form = CellNameForm(request.POST) # A form bound to the POST data
+        if form.is_valid():
+            cn = form.cleaned_data['cellname']
+            print cn
+            return HttpResponseRedirect(reverse('polls.views.results', args=(cn,)))
+    return render_to_response('search.html', RequestContext(request))
+
+def results(request, cellname):
+    return render_to_response('result.html', {'cell_name':cellname})
+	
+class CellNameForm(forms.Form):
+    cellname = forms.CharField(max_length=100)
+
+

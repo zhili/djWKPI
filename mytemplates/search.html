@@ -38,12 +38,17 @@ $(document).ready(function() {
 
 </head>
 <body>
-	<input type="text" class="ac_input" id="suggest" />
+<!-- <form action="/polls/celldetail/" method="post"> -->
+<form action="/polls/search/" method="post">
+{% csrf_token %}
+	<input type="text" class="ac_input" id="suggest" name="cellname"/>
 	  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
 	    <ul style="overflow: auto; max-height: 180px;">
 	       <li class="ac_even"></li>
 	       <li class="ac_odd"></li>
 	    </ul>
 	  </div>
+	<input type="submit" value="搜索" class="btn" />
+</form>
 </body>
 </html>

@@ -25,7 +25,7 @@ class Cell(models.Model):
 
 class KPI(models.Model):
     
-    date = models.DateField()
+    date = models.DateTimeField()
     ucell = models.ForeignKey(Cell)
     K01 = models.FloatField()
     K02 = models.FloatField()
