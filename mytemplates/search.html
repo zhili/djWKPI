@@ -1,8 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Django jQuery Autocomplete</title>
+<title>WCDMA UtranCells' KPI</title>
 <link rel="stylesheet" type="text/css" href="/polls/site_media/Autocomplete/jquery.autocomplete.css"/>
+<link rel="stylesheet" href="/polls/site_media/style.css" type="text/css" media="screen" />
 <script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script>
 <script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.autocomplete.js"></script>
 
@@ -39,16 +40,30 @@ $(document).ready(function() {
 </head>
 <body>
 <!-- <form action="/polls/celldetail/" method="post"> -->
+<a href="/"><img src="/polls/site_media/logo.png" alt=""  /></a> 
 <form action="/polls/search/" method="post">
 {% csrf_token %}
-	<input type="text" class="ac_input" id="suggest" name="cellname"/>
+	<input type="text" class="ac_input" id="suggest" name="cellname" maxlength="255" size="75"/>
 	  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
 	    <ul style="overflow: auto; max-height: 180px;">
 	       <li class="ac_even"></li>
 	       <li class="ac_odd"></li>
 	    </ul>
 	  </div>
-	<input type="submit" value="搜索" class="btn" />
+	<input type="submit" value="Search" class="btn" />
 </form>
+
+{% block shortcuts %}
+    {% include 'shortcuts.html' %}
+{% endblock %}
+
+{% block footer %}
+<div class="legal">
+ <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+    &copy; 2010 <a href="mailto:huzhili@gmail.com">huzhili@gmail.com</a>
+    <br />
+</div>
+{% endblock %}
+
 </body>
 </html>

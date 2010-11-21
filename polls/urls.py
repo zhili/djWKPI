@@ -22,7 +22,7 @@ urlpatterns = patterns('',
 
     (r'^(?P<cellname>\w+)/data/$', 'polls.views.chart_data'),
     (r'^(?P<cellname>\w+)/(?P<chart_id>\d+)/data/$', 'polls.views.chart_by_id'),
-    (r'^worst-cells/$', 'polls.views.worst_dcr_cells'),
+    (r'^worst-cells/(?P<ratetype>\w+)$', 'polls.views.worst_cells'),
     (r'^search/$', 'polls.views.tag_autocomplete'),
     (r'^results/(?P<cellname>\w+)$', 'polls.views.results'),
     # (r'^celldetail/$', 'polls.views.cellDetail')

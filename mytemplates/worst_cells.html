@@ -1,11 +1,58 @@
 <html>
 <head>
 	<title>Worst Cells</title>
+	<link rel="stylesheet" href="/polls/site_media/themes/blue/style.css" type="text/css" media="print, projection, screen" />
+	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
+	<script type="text/javascript" src="/polls/site_media/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="/polls/site_media/addons/pager/jquery.tablesorter.pager.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		$(function() { 
+		        $("table")
+		                    .tablesorter({widthFixed: true, widgets: ['zebra']})
+							.tablesorterPager({container: $("#pager")});
+		    } 
+		); 
+	</script>
 </head> 
 <body> 
-	<h1>Top10 DCR Cells</h1> 
-	<ul>{% for kpi in kpi_list %} 
-		<li>{{ kpi.ucell.id }} {{ kpi.K19_a }} {{ kpi.K19_b }}</li> 
-	{% endfor %} </ul>
+<div id="main">
+
+	<h1>TopN {{titleMsg}}</h1> 
+	<table table cellspacing="1" class="tablesorter">
+		<thead> 
+		<tr> 
+			{% for col in ColumnsHeader %}
+		    <th>{{col}}</th>
+		    {% endfor %}
+		</tr> 
+		</thead> 
+		<tbody>
+		{% for kpi in kpi_list %} 
+			 <tr>
+				<td><a href="{% url polls.views.results kpi.ucell.cell_name %}">{{ kpi.ucell.cell_name }}</a></td>
+				<td>{{ kpi.date }}</td>
+				<td>{{ kpi.part }}</td> 
+				<td>{{ kpi.all }} </td>
+				<td>{{ kpi.rate}} </td>	
+			 </tr> 
+		{% endfor %}
+		</tbody>
+	</table>
+	<div id="pager" class="pager">
+		<form>
+			<img src="/polls/site_media/addons/pager/icons/first.png" class="first"/>
+			<img src="/polls/site_media/addons/pager/icons/prev.png" class="prev"/>
+			<input type="text" class="pagedisplay"/>
+			<img src="/polls/site_media/addons/pager/icons/next.png" class="next"/>
+			<img src="/polls/site_media/addons/pager/icons/last.png" class="last"/>
+			<select class="pagesize">
+				<option selected="selected"  value="15">15</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option  value="40">40</option>
+			</select>
+		</form>
+	</div>
+</div>
 </body>
 </html>

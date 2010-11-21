@@ -13,38 +13,6 @@ def index(request):
         # 'latest_poll_list': latest_poll_list,
     })
     return HttpResponse(t.render(c))
-# 
-# def detail(request, poll_id):
-#     try:
-#         p = Poll.objects.get(pk=poll_id)
-#     except Poll.DoesNotExist:
-#         raise Http404
-#     return render_to_response('detail.html', {'poll': p},
-#                                context_instance=RequestContext(request))
-#  
-# 
-# def results(request, poll_id):
-#     p = get_object_or_404(Poll, pk=poll_id)
-#     return render_to_response('result.html', {'poll': p})
-# 
-# def vote(request, poll_id):
-#     p = get_object_or_404(Poll, pk=poll_id)
-#     try:
-#         selected_choice = p.choice_set.get(pk=request.POST['choice'])
-#     except (KeyError, Choice.DoesNotExist):
-#       # Redisplay the poll voting form.
-#         return render_to_response('detail.html', {
-#             'poll': p,
-#             'error_message': "You didn't select a choice.",
-#         }, context_instance=RequestContext(request))
-#     else:
-#         selected_choice.votes += 1
-#         selected_choice.save()
-#       # Always return an HttpResponseRedirect after successfully dealing
-#       # with POST data. This prevents data from being posted twice if a
-#       # user hits the Back button.
-#         return HttpResponseRedirect(reverse('polls.views.results', args=(p.id,)))
-
 
 from django import forms
 from datetime import datetime
@@ -107,8 +75,9 @@ def upload(request):
 # report = staff_member_required(upload)
 from pyofc2  import * 
 import time
+from django.core.exceptions import ObjectDoesNotExist
 def chart_by_id(request, cellname, chart_id):
-    print chart_id
+    # print chart_id
     my_cell = Cell.objects.get(cell_name=cellname)
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
@@ -142,6 +111,7 @@ def chart_data(request, cellname):
 
     # my_cell = Cell.objects.get(pk=1)
     my_cell = Cell.objects.get(cell_name=cellname)
+    # my_cell = cellname
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
@@ -173,10 +143,20 @@ def chart_data(request, cellname):
         ix += 1
     return HttpResponse(chart.render())
 
-def worst_dcr_cells(request):
-	kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'dcr':'K19_a*1.0 / K19_b'}).order_by('-dcr')[:10]
-	print kpi_list
-	return render_to_response('worst_cells.html', {'kpi_list':kpi_list})
+def worst_cells(request, ratetype):
+    # print ratetype
+    if ratetype == 'dcr':
+	    kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
+	    title ='Drop Call Rate'
+	    column_headers = ['Cell Name', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
+    elif ratetype == 'irat_ho':
+	    kpi_list = KPI.objects.filter(K18_b__gt=0).extra(select={'rate':'K18_a*1.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('rate')[:20]
+	    title = 'IRAT HO Success Rate'
+	    column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
+	# print kpi_list
+    else: # default use dcr
+	    return render_to_response('404.html')
+    return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers})
 	
 	
 from django.db.models import Q
@@ -191,11 +171,16 @@ def tag_autocomplete(request):
         form = CellNameForm(request.POST) # A form bound to the POST data
         if form.is_valid():
             cn = form.cleaned_data['cellname']
-            print cn
+            # print cn
             return HttpResponseRedirect(reverse('polls.views.results', args=(cn,)))
     return render_to_response('search.html', RequestContext(request))
 
 def results(request, cellname):
+    try:
+        my_cell = Cell.objects.get(cell_name=cellname)
+    except ObjectDoesNotExist:
+        return render_to_response('404.html')
+    # print my_cell
     return render_to_response('result.html', {'cell_name':cellname})
 	
 class CellNameForm(forms.Form):
