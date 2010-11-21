@@ -1,0 +1,235 @@
+
+
+body {
+  	text-align: center;
+  	min-width: 760px;  
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:12px;
+	margin:0;
+	padding:0;
+}
+
+img {
+	border: 0 none;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+} 
+
+
+h1 a:link {
+    color: #000000;
+}
+
+span a:link{
+    color: #333333;
+}
+a:link {
+    color: #015b90;
+}
+a:visited {
+    	
+}
+a:hover {
+	color:#FF0000;
+	text-decoration:none;
+}
+
+
+
+fieldset{
+	margin: 1em 0;
+	padding: 1em;
+	border: 1px solid #cccccc;
+	background: #8696A7;
+}
+
+legend{
+	font-weight: bold;
+	color:#ffffff;
+    background: #4A535C;
+}
+
+fieldset label{
+	display:block;
+}
+
+
+
+
+input:focus, textarea:focus {
+
+	background: #ffc;
+}
+
+
+textarea {
+	width: 318px;
+	height: 100px;
+}
+
+.autotable{
+    background: #aaaaaa;
+    width: 700px;
+    text-align: center;
+    color: #000000;
+    border:1px solid black;
+}
+
+.tdimg {
+    width: 140px;
+}
+
+
+.price{
+    background: #4a535c;
+    color: #ffffff;
+    font-size: 18px; 
+    width: 140px;
+}
+
+.mileage{
+    background: #73818f;
+    color: #ffffff;
+    font-size: 16px;
+    width: 140px;
+}
+
+
+.first_registration{
+    background: #8696a7;
+    color: #ffffff;
+    font-size: 14px;
+    width: 140px;
+}
+
+.kw{
+    background: #93a4b6;
+    color: #ffffff;
+    font-size: 12px;
+    width: 140px;
+}
+
+.title{
+    text-align: left;
+    font-size: 14px;
+}
+
+.description {
+    text-align: left;
+}
+
+
+.pageTitle{
+	text-transform:uppercase;
+}
+
+
+
+.quiet{
+    font-weight:bold;
+}
+
+.red{
+    color: #ff0000;
+}
+
+.errorlist {
+    font-weight:bold;
+    color: #ff0000;
+}
+
+.paging {
+    float: right;
+    clear:both;
+    padding-right: 90px;
+}
+
+
+.authenticated{
+    text-align: right;
+    color: #777777;
+}
+
+.bigfont{
+    font-size: 18px;
+}
+
+.message {
+    color: green;
+}
+
+#wrapper {
+  width: 750px; 
+  margin: 0 auto;
+  text-align: left;  
+  border: 3px;
+}
+
+#branding {
+    /*background:transparent url(logo.jpg) no-repeat scroll 0 0;*/
+    text-align:center;
+    width: 750px;
+}
+
+#search{
+	width: 700px;
+	height: 25px;
+	padding-left: 30px;
+	padding-top: 15px;
+}
+
+#query {
+	width:500px;
+}
+
+#shortcuts {
+    text-align: center;
+	padding-top:20px;
+/*	padding-left: 60px;*/
+}
+
+
+
+#content {
+  width: 700px;
+  padding-top: 10px;
+  padding-right: 0px;
+  padding-left: 30px;
+  padding-bottom: 0px;
+}
+
+
+
+#content h1, #content h2, #content p {
+  padding-right: 20px;
+}
+
+#tags {
+	width:500px;
+	padding-left: 200px;
+}
+
+#footer {
+  clear: both;
+  text-align: center;
+}
+
+
+
+#searchcat {
+    width:620px;
+    height: 70px;
+    text-align: left;
+    padding-left: 170px;
+    
+}
+
+#tabledetails {
+    width: 700px;
+    table-layout:fixed;
+}
+
