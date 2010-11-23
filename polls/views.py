@@ -55,7 +55,7 @@ def handle_uploaded_file(f):
 	        rid= row[0]
 	        cn = row[1]
 	        # get rid of '' to in error
-	        row[5:] = [s if s!='' else '0' for s in row[5:]]
+	        row[5:] = [s if s!='' and s!='#EMPTY' else '0' for s in row[5:]]
 	        if last_cell_name != cn:
 	           # new cell
 	           if last_cell_name != '':
@@ -141,39 +141,68 @@ from django.core.exceptions import ObjectDoesNotExist
 def chart_by_id(request, cellname, chart_id):
     # print chart_id
     my_cell = Cell.objects.get(cell_name=cellname)
+    today = date.today()
+    begin = today - timedelta(days=7)
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
-    b = bar()
-    y = y_axis()
-    y.min, y.max, y.steps = 0, 1, 0.1
-    chart.y_axis = y
+    cell_kpi_set = my_cell.kpi_set.filter(date__range=(begin, today))
+    if chart_id == '1':
+        b = bar()
+        y = y_axis()
+        y.min, y.max, y.steps = 0, 1, 0.1
+        chart.y_axis = y     
+        x = x_axis()
+        xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
+        lbls = []
+        for item in cell_kpi_set:
+	        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
     
-    x = x_axis()
-    xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
-    lbls = []
-    for item in my_cell.kpi_set.all():
-	    lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+        xlbls.labels = lbls 
+        x.labels = xlbls
+        chart.x_axis = x
     
-    xlbls.labels = lbls 
-    x.labels = xlbls
-    chart.x_axis = x
-    
-    # l.halo_size = 10
-    b.width = 4
-    # l.dot_size = 4
-    b.tip = 'value: #val#'
-    b.text = 'AMR Traffic'
-    b.values = [item.K01 for item in my_cell.kpi_set.all()]
-    chart.add_element(b)
+        # l.halo_size = 10
+        b.width = 4
+        # l.dot_size = 4
+        b.tip = '#key# <br> ?val#', 
+        b.text = 'Drop Call Rate'
 
+        b.values = [float(item.K19_a * 1.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
+        chart.add_element(b)
+    elif chart_id == '2':
+        l = line_hollow()
+        y = y_axis()
+        y.min, y.max, y.steps = 0, 1, 0.1
+        chart.y_axis = y     
+        x = x_axis()
+        xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
+        lbls = []
+
+        for item in cell_kpi_set:
+	        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+    
+        xlbls.labels = lbls 
+        x.labels = xlbls
+        chart.x_axis = x
+        l.colour = "#3133C0"
+        l.width = 4
+        # l.halo_size = 10
+        l.dot_size = 4
+        l.tip = '#key#  #val#'
+        l.text = 'IRAT HO'
+        l.values = [float(item.K18_a * 1.0 / item.K18_b) if item.K18_b > 0 else 0 for item in cell_kpi_set]
+        chart.add_element(l)
+    else:
+	    None
     return HttpResponse(chart.render())
 
 def chart_data(request, cellname):
 
     # my_cell = Cell.objects.get(pk=1)
     my_cell = Cell.objects.get(cell_name=cellname)
-    # my_cell = cellname
+    # today = date.today()
+    # begin = today - timedelta(days=1)
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
@@ -205,14 +234,18 @@ def chart_data(request, cellname):
         ix += 1
     return HttpResponse(chart.render())
 
+from datetime import date
 def worst_cells(request, ratetype):
     # print ratetype
+    # today = date.today()
+    # begin = today - timedelta(days=1) # worst cells in N days
     if ratetype == 'dcr':
-	    kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
+	    # kpi_list = KPI.objects.filter(date__range=(begin, today), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
+	    kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-date','-rate')[:30]
 	    title ='Drop Call Rate'
 	    column_headers = ['Cell Name', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
     elif ratetype == 'irat_ho':
-	    kpi_list = KPI.objects.filter(K18_b__gt=0).extra(select={'rate':'K18_a*1.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('rate')[:20]
+	    kpi_list = KPI.objects.filter(K18_b__gt=0).extra(select={'rate':'K18_a*1.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('-date', 'rate')[:30]
 	    title = 'IRAT HO Success Rate'
 	    column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
 	# print kpi_list
@@ -241,8 +274,21 @@ from django.db.models import Sum
 def results(request, cellname):
     # print my_cell
     # print KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
-    if Cell.objects.filter(cell_name=cellname).exists():	    
-        return render_to_response('result.html', {'cell_name':cellname})
+    if Cell.objects.filter(cell_name=cellname).exists():
+	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
+        my_cell = Cell.objects.get(cell_name=cellname)
+        today = date.today()
+        begin = today - timedelta(days=7)
+        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'))
+        kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
+        rate_column = []
+        for row in kset:
+            l = [row.date, row.K18_a, row.K18_b, row.K19_a, row.K19_b, row.K18_a * 1.0 / row.K18_b if row.K18_b > 0 else 0, row.K19_a * 1.0 / row.K19_b if row.K19_b > 0 else 0]
+            rate_column.append(l)
+        l = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK18_a'] * 1.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 0, sum_columns['SK19_a'] * 1.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0]
+        rate_column.append(l)
+        column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'System Release', 'All Release', 'IRAT HO Success Rate', 'Drop Call Rate']
+        return render_to_response('result.html', {'cell_name':cellname, 'ColumnsHeader':column_headers, 'rate_list':rate_column})
     return render_to_response('404.html')
 	
 class CellNameForm(forms.Form):
