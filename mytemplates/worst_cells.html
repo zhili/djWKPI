@@ -15,6 +15,33 @@
 	</script>
 </head> 
 <body> 
+	
+	<div id = 'sub'>
+        <h1>RNC {{titleMsg}}</h1> 
+		<table table23 cellspacing="1" class="tablesorter">
+			<thead> 
+			<tr> 
+
+			    <th>{{ColumnsHeader.1}}</th>
+				<th>{{ColumnsHeader.2}}</th>
+				<th>{{ColumnsHeader.3}}</th>
+				<th>{{ColumnsHeader.4}}</th>
+				<th>{{ColumnsHeader.5}}</th>
+			</tr> 
+			</thead>
+			<tbody>
+			{% for k in rnc_kpi %} 
+			<tr>
+				<td> {{k.0}}</td>
+	 			<td> {{k.1}} </td>
+				<td> {{k.2}} </td>
+				<td> {{k.3}} </td>
+				<td> {{k.4}} </td>
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		
 <div id="main">
 
 	<h1>TopN {{titleMsg}}</h1> 
@@ -30,6 +57,7 @@
 		{% for kpi in kpi_list %} 
 			 <tr>
 				<td><a href="{% url polls.views.results kpi.ucell.cell_name %}">{{ kpi.ucell.cell_name }}</a></td>
+				<td>{{ kpi.ucell.rnc_id }}</td>
 				<td>{{ kpi.date }}</td>
 				<td>{{ kpi.part }}</td> 
 				<td>{{ kpi.all }} </td>
@@ -54,5 +82,7 @@
 		</form>
 	</div>
 </div>
+
+
 </body>
 </html>
