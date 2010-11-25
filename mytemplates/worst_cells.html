@@ -1,5 +1,5 @@
-<html>
-<head>
+{% extends "base.html" %}
+{% block extrahead %}
 	<title>Worst Cells</title>
 	<link rel="stylesheet" href="/polls/site_media/themes/blue/style.css" type="text/css" media="print, projection, screen" />
 	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
@@ -13,8 +13,9 @@
 		    } 
 		); 
 	</script>
-</head> 
-<body> 
+{% endblock %}
+
+{% block content %}
 	
 	<div id = 'sub'>
         <h1>RNC {{titleMsg}}</h1> 
@@ -83,6 +84,4 @@
 	</div>
 </div>
 
-
-</body>
-</html>
+{% endblock %}

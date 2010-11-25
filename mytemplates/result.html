@@ -1,8 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-
-<html lang="en">
-<head>
+{% extends "base.html" %}
+{% block extrahead %}
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Ucell KPI App</title>
 	<meta name="author" content="Pradeep Gowda">
@@ -25,17 +22,18 @@
     	//   "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
     	//   {"data-file":"/polls/{{cell_name}}/data/"} );
     	swfobject.embedSWF(
-    	  "/polls/site_media/open-flash-chart.swf", "chart_dropcall",
+    	  "/polls/site_media/open-flash-chart.swf", "chart_me",
     	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
-    	  {"data-file":"/polls/{{cell_name}}/1/data/"} );
-    	swfobject.embedSWF(
-    	  "/polls/site_media/open-flash-chart.swf", "chart_irat",
-    	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
-    	  {"data-file":"/polls/{{cell_name}}/2/data/"} );
+    	  {"data-file":"/polls/{{cell_name}}/data/"} );
+    	// swfobject.embedSWF(
+    	//   "/polls/site_media/open-flash-chart.swf", "chart_irat",
+    	//   "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
+    	//   {"data-file":"/polls/{{cell_name}}/2/data/"} );
 
     </script>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
   <h1>{{cell_name}} kpi</h1>
   <div id="main">
 	<table table cellspacing="1" class="tablesorter">
@@ -64,8 +62,6 @@
 		</tbody>
 	</table>
 </div>
-  <div class="chart" id="chart_dropcall"></div>
-  <div class="chart" id="chart_irat"></div>
-
-</body>
-</html>
+  <div class="chart" id="chart_me"></div>
+  <!-- <div class="chart" id="chart_irat"></div> -->
+{% endblock %}

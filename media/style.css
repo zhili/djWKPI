@@ -1,3 +1,41 @@
+/* == HEADER LOGO == */
+ 
+div#header div.logo {
+    font-size: 15px;
+	font-family: Arial,Helvetica,sans-serif; 
+    overflow: hidden;
+    background: url(./logo_bg.gif) repeat-x;
+}
+
+div#header div.logo img {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+div#header div.logo ul {
+    list-style: none;
+    float: right;
+    padding: 40px 20px;
+    text-align: right;
+}
+
+div#header div.logo ul li a {
+    color: #4E4C37;
+    text-decoration: none;
+	padding: 40px 10px;
+}
+
+div#header div.logo ul li {
+    display: inline;
+}
+
+div#header div.logo ul li a:hover {
+    background: #FFF;
+    cursor: pointer;
+}
+
+/* == END HEADER LOGO == */
 
 
 body {

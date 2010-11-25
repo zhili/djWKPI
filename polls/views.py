@@ -141,7 +141,7 @@ from django.core.exceptions import ObjectDoesNotExist
 def chart_by_id(request, cellname, chart_id):
     # print chart_id
     my_cell = Cell.objects.get(cell_name=cellname)
-    today = date.today()
+    today = date.today() + timedelta(days=1)
     begin = today - timedelta(days=10)
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
@@ -199,39 +199,52 @@ def chart_by_id(request, cellname, chart_id):
 
 def chart_data(request, cellname):
 
-    # my_cell = Cell.objects.get(pk=1)
     my_cell = Cell.objects.get(cell_name=cellname)
-    # today = date.today()
-    # begin = today - timedelta(days=1)
+    today = date.today() + timedelta(days=1)
+    begin = today - timedelta(days=10)
+
+    cell_kpi_set = my_cell.kpi_set.filter(date__range=(begin, today))
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
+    chart.bg_colour = '#FFFFFF'
     y = y_axis()
-    y.min, y.max, y.steps = 0, 50, 5
-    chart.y_axis = y
+    y.min, y.max, y.steps = 0, 100, 10
+    y.grid_colour = '#EDF5F9'
+    y.colour = '#FF6600'
+    chart.y_axis = y     
     x = x_axis()
-    lbl = labels(labels=['AMR Traffic', 'VP Traffic', 'CS Traffic', 'PS Uplink throughout', 'PS Downlink throughout'])
-    x.labels=lbl
+    x.grid_colour = '#EDF5F9'
+    x.colour = '#FF6600'
+    xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
+    lbls = []
+
+    for item in cell_kpi_set:
+        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+    xlbls.labels = lbls 
+    x.labels = xlbls
     chart.x_axis = x
-    # chart.bg_colour = '#121212'
-    line_colors = ["#6F0073", "#3133C0", "#089C14", "#F0DFA1", "#DFC329"]
-    ix = 0
-    for acell in my_cell.kpi_set.all():
-	    # print acell.ucell.cell_name, acell.date, acell.K01
-        l = line_hollow()
-        # l.halo_size = 10
-        l.width = 4
-        # l.dot_size = 4
-        l.tip = 'value: #val#'
-        l.text = 'purge line'
-        l.colour = line_colors[ix]
-        l.values = [acell.K01,acell.K02,acell.K03, acell.K04, acell.K05]
-        chart.add_element(l)
-        # b1 = bar_filled(colour='#E2D66A')
-        # b1.values = [acell.K01,acell.K02,acell.K03, acell.K04, acell.K05]
-        # b1.outline_colour = '#577261'   
-        # chart.add_element(b1)
-        ix += 1
+
+    l_K18 = line_hollow()
+    l_K18.colour = "#3133C0"
+    l_K18.width = 4
+    l_K18.halo_size = 2
+    # l_K18.dot_size = 4
+    l_K18.tip = '#key#  #val#'
+    l_K18.text = 'IRAT HO'
+    l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 0 for item in cell_kpi_set]
+
+    l_K19 = line_hollow()
+    l_K19.colour = "#00FF00"
+    l_K19.width = 4
+    # l.halo_size = 10
+    l_K19.dot_size = 4
+    l_K19.tip = '#key#  #val#'
+    l_K19.text = 'Drop Call'
+    l_K19.values = [float(item.K19_a * 100.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
+
+    chart.add_element(l_K18)
+    chart.add_element(l_K19)
     return HttpResponse(chart.render())
 
 from datetime import date
@@ -242,7 +255,7 @@ def worst_cells(request, ratetype):
     # begin = today - timedelta(days=1) # worst cells in N days
     if ratetype == 'dcr':
 	    # kpi_list = KPI.objects.filter(date__range=(begin, today), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b')).order_by('-date')[:1]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b')).order_by('-date')[:4]
 	    rnc_kpi = []
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
@@ -251,7 +264,7 @@ def worst_cells(request, ratetype):
 	    title ='Drop Call Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
     elif ratetype == 'irat_ho':
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:1]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:4]
 	    rnc_kpi = []
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 0]
@@ -289,7 +302,7 @@ def results(request, cellname):
     if Cell.objects.filter(cell_name=cellname).exists():
 	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
         my_cell = Cell.objects.get(cell_name=cellname)
-        today = date.today()
+        today = date.today() + timedelta(days=1)
         begin = today - timedelta(days=10)
         sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'))
         kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
@@ -306,4 +319,5 @@ def results(request, cellname):
 class CellNameForm(forms.Form):
     cellname = forms.CharField(max_length=100)
 
-
+def about(request):
+    return render_to_response('about.html')
