@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     (r'^search/$', 'polls.views.tag_autocomplete'),
     (r'^results/(?P<cellname>\w+)$', 'polls.views.results'),
     (r'^about/$', 'polls.views.about'),
+    (r'^worst-cells/date/(?P<ratetype>\w+)/$', 'polls.views.changedate')
     # (r'^celldetail/$', 'polls.views.cellDetail')
 )
 

@@ -271,3 +271,6 @@ textarea {
     table-layout:fixed;
 }
 
+div#selecteddate {
+	text-align: left;
+}

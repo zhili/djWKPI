@@ -253,10 +253,14 @@ def worst_cells(request, ratetype):
     # print ratetype
     # today = date.today()
     # begin = today - timedelta(days=1) # worst cells in N days
+    dateform = DateSelectForm()
+    rnc_kpi = []
+    kpi_list = []
+    title = 'No Title'
     if ratetype == 'dcr':
 	    # kpi_list = KPI.objects.filter(date__range=(begin, today), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
 	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b')).order_by('-date')[:4]
-	    rnc_kpi = []
+
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
 		    rnc_kpi.append(l)
@@ -265,7 +269,6 @@ def worst_cells(request, ratetype):
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
     elif ratetype == 'irat_ho':
 	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:4]
-	    rnc_kpi = []
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 0]
 		    rnc_kpi.append(l)
@@ -275,7 +278,7 @@ def worst_cells(request, ratetype):
 
     else: # default use dcr
 	    return render_to_response('404.html')
-    return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi})
+    return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
 	
 	
 from django.db.models import Q
@@ -321,3 +324,44 @@ class CellNameForm(forms.Form):
 
 def about(request):
     return render_to_response('about.html')
+
+
+class DateSelectForm(forms.Form):        
+
+    selectedDate = forms.DateField(('%d/%m/%Y',), label='Date', required=False, initial=date.today(),
+        widget=forms.DateTimeInput(format='%d/%m/%Y', attrs={
+            'class':'input',
+            'readonly':'readonly',
+            'size':'15'
+        })
+    )
+
+def changedate(request, ratetype):
+    kpi_list = []
+    title = 'Not Found'
+    rnc_kpi = []
+    column_headers = []
+    dateform = DateSelectForm()
+    if request.method == 'POST':
+        dateform = DateSelectForm(request.POST) # A form bound to the POST data
+        if dateform.is_valid():
+            selected_date = dateform.cleaned_data['selectedDate']
+            if ratetype == 'dcr':      
+                rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'))
+                for kp in rnc_kpi_list:
+                    l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
+                    rnc_kpi.append(l)
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:30]
+                title ='Drop Call Rate'
+                column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
+            elif ratetype == 'irat_ho':
+                rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'))
+                for kp in rnc_kpi_list:
+                    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 0]
+                    rnc_kpi.append(l)
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('rate')[:30]
+                title = 'IRAT HO Success Rate'
+                column_headers = ['Cell Name', 'RNC ID', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
+    	    else: # 404
+			    return render_to_response('404.html') 
+    return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
