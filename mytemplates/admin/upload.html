@@ -1,8 +1,22 @@
 {% extends "admin/base_site.html" %}
-
+{% block extrastyle %}
+<link rel="stylesheet" href="/polls/site_media/fileuploader/fileuploader.css" type="text/css"/>
+<script type="text/javascript" src="/polls/site_media/fileuploader/fileuploader.js"></script>
+<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
+<script type= "text/javascript">
+	$(document).ready(function(){
+		new qq.FileUploader({
+			action: '/admin/upload/',
+			element: document.getElementById('file-uploader'),
+			allowedExtensions: ['csv',], 
+		});
+	});
+</script>
+	
+{% endblock %}
 {% block content %}
 
-<div id="content-main">
+<!-- <div id="content-main">
     <h2>Upload CSV</h2>
     <form action="." method="post" accept-charset="utf-8" enctype="multipart/form-data"> 
 	{% csrf_token %}
@@ -11,6 +25,15 @@
         </table>
         <input type="submit" class="submit" value="Upload"/>
     </form>
+</div> -->
+<div id="content-main">
+    <h2>Upload CSV</h2>
+
+<div id="file-uploader"> 
+	<noscript>          
+	        <p>Please enable JavaScript to use file uploader.</p>
+	</noscript>
 </div>
 
+</div> 
 {% endblock %}

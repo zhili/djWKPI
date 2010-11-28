@@ -60,7 +60,7 @@ def handle_uploaded_file(f):
 	           # new cell
 	           if last_cell_name != '':
 	              # add to db except the first time
-	              print 'push db'
+	              # print 'push db'
 	              if Cell.objects.filter(cell_name=hdict['UCell Name']).exists():
 	                 ucell = Cell.objects.get(cell_name=hdict['UCell Name'])
 	              else:
@@ -89,8 +89,8 @@ def handle_uploaded_file(f):
 	           continue
             # sum the data with the same hour
 	        i = 0 # the perf data start with index: 5
-	        print 'sum data'
-	        print hdict
+	        # print 'sum data'
+	        # print hdict
 	        for k in header:
 	            if i > 4:
 	                 hdict[k] += float(row[i])
@@ -99,8 +99,8 @@ def handle_uploaded_file(f):
     except csv.Error, e:
         # render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
 	    return False
-    print 'push db'
-    print hdict
+    # print 'push db'
+    # print hdict
     if Cell.objects.filter(cell_name=hdict['UCell Name']).exists():
        ucell = Cell.objects.get(cell_name=hdict['UCell Name'])
     else:
@@ -118,19 +118,37 @@ def handle_uploaded_file(f):
     ucell.kpi_set.add(kpi)
     return True
 
+import StringIO
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import simplejson
+@csrf_exempt
 def upload(request):
+
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            if (False == handle_uploaded_file(request.FILES['file'])):
-	            # !!!not safe!!!
-	            return render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
-            return HttpResponseRedirect('/admin/')
-    else:
-	    form = UploadFileForm()
+        # print request.is_ajax()
+        # print request.META['HTTP_X_FILE_NAME']
+        # with io.BufferedReader( io.BytesIO( request.raw_post_data) ) as stream:
+        #      with io.BufferedWriter( io.FileIO( "/tmp/%s" % request.META['HTTP_X_FILE_NAME'], "wb" ) ) as destination:
+        #           foo = stream.read( 1024 )
+        #           while foo:
+        #               destination.write( foo )
+        #               foo = stream.read( 1024 )
+        # print  request.POST
+        # data =  request.FILES['qqfile']
+        #        print data.name
+        # form = UploadFileForm(request.POST, request.FILES)
+        # if form.is_valid():
+        #          print 'valid'
+        #          if (False == handle_uploaded_file(request.FILES['qqfile'])):
+        # 	            # !!!not safe!!!
+        # 	            return render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
+        # return HttpResponseRedirect('/admin/')
+        pseudofile = StringIO.StringIO(request.raw_post_data)
+        if (False == handle_uploaded_file(pseudofile)):
+            HttpResponse(simplejson.dumps({"error":"error message to display"}))
+        return HttpResponse(simplejson.dumps({"success": "true"}))
     return render_to_response(
         "admin/upload.html",
-        {'form': form},
         RequestContext(request),
     )
 
