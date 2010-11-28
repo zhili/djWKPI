@@ -250,7 +250,7 @@ def chart_data(request, cellname):
     # l_K18.dot_size = 4
     l_K18.tip = '#key#  #val#'
     l_K18.text = 'IRAT HO'
-    l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 0 for item in cell_kpi_set]
+    l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 100.0 for item in cell_kpi_set]
 
     l_K19 = line_hollow()
     l_K19.colour = "#00FF00"
@@ -261,8 +261,19 @@ def chart_data(request, cellname):
     l_K19.text = 'Drop Call'
     l_K19.values = [float(item.K19_a * 100.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
 
+    l_K16 = line_hollow()
+    l_K16.colour = "#A60289"
+    l_K16.width = 4
+    l_K16.halo_size = 2
+    # l_K18.dot_size = 4
+    l_K16.tip = '#key#  #val#'
+    l_K16.text = 'Soft HO'
+    l_K16.values = [float(item.K16_a * 100.0 / item.K16_b) if item.K16_b > 0 else 100.0 for item in cell_kpi_set]
+
+
     chart.add_element(l_K18)
     chart.add_element(l_K19)
+    chart.add_element(l_K16)
     return HttpResponse(chart.render())
 
 from datetime import date
@@ -288,7 +299,7 @@ def worst_cells(request, ratetype):
     elif ratetype == 'irat_ho':
 	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:4]
 	    for kp in rnc_kpi_list:
-		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 0]
+		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
 	    kpi_list = KPI.objects.filter(K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('-date', 'rate')[:30]
 	    title = 'IRAT HO Success Rate'
@@ -325,15 +336,19 @@ def results(request, cellname):
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
         begin = today - timedelta(days=10)
-        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'))
+        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'))
         kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
         rate_column = []
         for row in kset:
-            l = [row.date, row.K18_a, row.K18_b, row.K19_a, row.K19_b, row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 0, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0]
+            l = [row.date, row.K18_a, row.K18_b, row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 100.0, 
+                 row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
+                 row.K16_a, row.K16_b, row.K16_a * 100.0 / row.K16_b if row.K16_b > 0 else 100.0]
             rate_column.append(l)
-        l = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 0, sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0]
+        l = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 100.0,
+                      sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0, 
+                      sum_columns['SK16_a'], sum_columns['SK16_b'], sum_columns['SK16_a'] * 100.0 / sum_columns['SK16_b'] if sum_columns['SK16_b'] > 0 else 100.0]
         rate_column.append(l)
-        column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'System Release', 'All Release', 'IRAT HO Success Rate', 'Drop Call Rate']
+        column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate', 'System Release', 'All Release', 'Drop Call Rate', 'ActSet Update Success', 'ActSet Update Request', 'Soft Ho Success Rate']
         return render_to_response('result.html', {'cell_name':cellname, 'ColumnsHeader':column_headers, 'rate_list':rate_column})
     return render_to_response('404.html')
 	
@@ -375,7 +390,7 @@ def changedate(request, ratetype):
             elif ratetype == 'irat_ho':
                 rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'))
                 for kp in rnc_kpi_list:
-                    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 0]
+                    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0]
                     rnc_kpi.append(l)
                 kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('rate')[:30]
                 title = 'IRAT HO Success Rate'

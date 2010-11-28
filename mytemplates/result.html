@@ -4,16 +4,28 @@
 	<title>Ucell KPI App</title>
 	<meta name="author" content="Pradeep Gowda">
 	<!-- Date: 2009-04-15 -->  
-	<link rel="stylesheet" href="/polls/site_media/themes/blue/style.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
+	<link rel="stylesheet" href="/polls/site_media/ColVis.css" type="text/css"/>
 	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
-	<script type="text/javascript" src="/polls/site_media/jquery.tablesorter.js"></script>
-	<script type="text/javascript" src="/polls/site_media/addons/pager/jquery.tablesorter.pager.js"></script>
-	<script type="text/javascript" charset="utf-8">
-		$(function() { 
-		        $("table")
-		                    .tablesorter({widthFixed: true, widgets: ['zebra']})
-		    } 
-		); 
+    <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/polls/site_media/ColVis.min.js"></script>
+	<script type="text/javascript" charset="utf-8"> 
+		$(document).ready( function () {
+			$('#example2').dataTable( {
+				"sDom": 'C<"clear">lfrtip', 
+				// "bJQueryUI": true
+				// "sSearch": "Custom filter",
+				"aaSorting": [],
+				"oLanguage": {
+				"sSearch": "Custom filter:"
+				},
+				// "sScrollX": "100%",
+				// "sScrollXInner": "110%",
+				// "bScrollCollapse": true,
+				"bInfo": false, "bPaginate": false,
+			} );
+		} );
 	</script>
 	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
     <script type="text/javascript">
@@ -36,7 +48,7 @@
 {% block content %}
   <h1>{{cell_name}} kpi</h1>
   <div id="main">
-	<table table cellspacing="1" class="tablesorter">
+	<table table cellspacing="1" class="display" id="example2">
 		<thead> 
 		<tr> 		
 		    {% for col in ColumnsHeader %}
@@ -49,13 +61,9 @@
           	{% for rate in rate_list %}
 				 <tr>
 					<td>{{cell_name}}</td>
-					<td>{{ rate.0 }}</td>
-					<td>{{ rate.1 }}</td>
-					<td>{{ rate.2 }}</td> 
-					<td>{{ rate.3 }} </td>
-					<td>{{ rate.4 }} </td>
-					<td>{{ rate.5 }} </td>
-					<td>{{ rate.6 }} </td>
+					{% for col in rate %}
+					   <td> {{ col }}</td>
+					{% endfor %}
 				 </tr> 
 			{% endfor %}
 
