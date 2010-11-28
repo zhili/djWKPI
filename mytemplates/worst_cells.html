@@ -9,12 +9,18 @@
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
 			$('#example1').dataTable( {
-				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false,
+				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, 
 				// "bJQueryUI": true
 			} );
-			$('#example2').dataTable({"oLanguage":{ "sSearch": "Custom filter" }}, {
-				"sDom": 'C<"clear">lfrtip',
+			$('#example2').dataTable( {
+				"sDom": 'C<"clear">lfrtip', 
 				// "bJQueryUI": true
+				// "sSearch": "Custom filter",
+				"aaSorting": [],
+				"oLanguage": {
+				"sSearch": "Custom filter:"
+				},
+
 			} );
 		} );
 	</script>
