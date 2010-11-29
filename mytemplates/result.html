@@ -2,29 +2,43 @@
 {% block extrahead %}
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Ucell KPI App</title>
-	<meta name="author" content="Pradeep Gowda">
-	<!-- Date: 2009-04-15 -->  
+	<meta name="author" content="zhili hu">
 	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
 	<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
-	<link rel="stylesheet" href="/polls/site_media/ColVis.css" type="text/css"/>
+	<link rel="stylesheet" href="/polls/site_media/demo_table_jui.css" type="text/css" />
+	<style type="text/css" title="currentStyle"> 
+          .ui-tabs .ui-tabs-panel { padding: 10px }
+	</style>
+
 	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
     <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="/polls/site_media/ColVis.min.js"></script>
+	<script src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>
+	<script src="/polls/site_media/jquery.ui.tabs.js"></script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
-			$('#example2').dataTable( {
-				"sDom": 'C<"clear">lfrtip', 
-				// "bJQueryUI": true
-				// "sSearch": "Custom filter",
-				"aaSorting": [],
-				"oLanguage": {
-				"sSearch": "Custom filter:"
-				},
-				// "sScrollX": "100%",
-				// "sScrollXInner": "110%",
-				// "bScrollCollapse": true,
-				"bInfo": false, "bPaginate": false,
-			} );
+			$("#tabs").tabs( {
+							"show": function(event, ui) {
+								var oTable = $('div.dataTables_scrollBody>table.display', ui.panel).dataTable();
+								if ( oTable.length > 0 ) {
+									oTable.fnAdjustColumnSizing();
+								}
+							}
+						} );
+			$('table.display').dataTable( {
+								"sDom": '<"H"Cfr>t<"F"ip>',
+								// "sScrollX": "100%",
+								// "sScrollXInner": "110%",
+								"bScrollCollapse": true,
+								"bPaginate": false,
+								"bJQueryUI": true,
+								"aaSorting": [],
+								"oLanguage": {
+								"sSearch": "Custom filter:"
+								},
+								// "aoColumnDefs": [
+								// 	{ "sWidth": "10%", "aTargets": [ -1 ] }
+								// ]
+							} );
 		} );
 	</script>
 	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
@@ -48,28 +62,82 @@
 {% block content %}
   <h1>{{cell_name}} kpi</h1>
   <div id="main">
-	<table table cellspacing="1" class="display" id="example2">
-		<thead> 
-		<tr> 		
-		    {% for col in ColumnsHeader %}
-		    <th>{{col}}</th>
-		    {% endfor %}
-		</tr> 
-		</thead> 
-		<tbody>
+		<div id="tabs"> 
+			<ul> 
+				<li><a href="#tabs-1">Drop Call</a></li> 
+				<li><a href="#tabs-2">HandOver</a></li> 
+				<li><a href="#tabs-3">Traffic Vol</a></li>
+			</ul>
+			<div id="tabs-1"> 
+				<table cellspacing="0" cellspacing="0" border="0" class="display" id="example1">
+					<thead> 
+						<tr> 		
+					    {% for col in dc_head %}
+					    	<th>{{col}}</th>
+					    {% endfor %}
+						</tr> 
+					</thead> 
+					<tbody>
 
-          	{% for rate in rate_list %}
-				 <tr>
-					<td>{{cell_name}}</td>
-					{% for col in rate %}
-					   <td> {{ col }}</td>
-					{% endfor %}
-				 </tr> 
-			{% endfor %}
+			          	{% for rate in cate_dc %}
+							 <tr>
+								<td>{{cell_name}}</td>
+								{% for col in rate %}
+								   <td> {{ col }}</td>
+								{% endfor %}
+							 </tr> 
+						{% endfor %}
 
-		</tbody>
-	</table>
-</div>
+					</tbody>
+				</table>
+			</div>
+			<div id="tabs-2"> 
+				<table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
+					<thead> 
+						<tr> 		
+					    {% for col in ho_head %}
+					    	<th>{{col}}</th>
+					    {% endfor %}
+						</tr> 
+					</thead> 
+					<tbody>
+
+			          	{% for rate in cate_ho %}
+							 <tr>
+								<td>{{cell_name}}</td>
+								{% for col in rate %}
+								   <td> {{ col }}</td>
+								{% endfor %}
+							 </tr> 
+						{% endfor %}
+
+					</tbody>
+				</table>
+			</div>
+			<div id="tabs-3"> 
+				<table cellspacing="0" cellspacing="0" border="0" class="display" id="example3">
+					<thead> 
+						<tr> 		
+					    {% for col in tv_head %}
+					    	<th>{{col}}</th>
+					    {% endfor %}
+						</tr> 
+					</thead> 
+					<tbody>
+
+			          	{% for rate in cate_tv %}
+							 <tr>
+								<td>{{cell_name}}</td>
+								{% for col in rate %}
+								   <td> {{ col }}</td>
+								{% endfor %}
+							 </tr> 
+						{% endfor %}
+
+					</tbody>
+				</table>
+			</div>
+  </div>
   <div class="chart" id="chart_me"></div>
   <!-- <div class="chart" id="chart_irat"></div> -->
 {% endblock %}

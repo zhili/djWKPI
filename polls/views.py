@@ -335,21 +335,46 @@ def results(request, cellname):
 	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
-        begin = today - timedelta(days=10)
-        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'))
+        begin = today - timedelta(days=7)
+        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), 
+                                             SK20_a=Sum('K20_a'), SK20_b=Sum('K20_b'), SK21_a=Sum('K21_a'), SK21_b=Sum('K21_b'),
+                                             SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'),
+                                             SK17_a=Sum('K17_a'), SK17_b=Sum('K17_b'), SK06=Sum('K06'), SK07=Sum('K07'),
+                                             SK01=Sum('K01'), SK02=Sum('K02'), SK03=Sum('K03'), SK04=Sum('K04'), SK05=Sum('K05'))
         kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
-        rate_column = []
+        category_dc = []
+        category_ho = []
+        category_tv = []
         for row in kset:
-            l = [row.date, row.K18_a, row.K18_b, row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 100.0, 
-                 row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
-                 row.K16_a, row.K16_b, row.K16_a * 100.0 / row.K16_b if row.K16_b > 0 else 100.0]
-            rate_column.append(l)
-        l = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 100.0,
-                      sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0, 
-                      sum_columns['SK16_a'], sum_columns['SK16_b'], sum_columns['SK16_a'] * 100.0 / sum_columns['SK16_b'] if sum_columns['SK16_b'] > 0 else 100.0]
-        rate_column.append(l)
-        column_headers = ['Cell Name', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate', 'System Release', 'All Release', 'Drop Call Rate', 'ActSet Update Success', 'ActSet Update Request', 'Soft Ho Success Rate']
-        return render_to_response('result.html', {'cell_name':cellname, 'ColumnsHeader':column_headers, 'rate_list':rate_column})
+            l_dc = [row.date, row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
+                              row.K20_a, row.K20_b, row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0, 
+                              row.K21_a, row.K21_b, row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0]
+            category_dc.append(l_dc)
+            l_ho = [row.date, row.K18_a, row.K18_b, row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 100.0, 
+                              row.K16_a, row.K16_b, row.K16_a * 100.0 / row.K16_b if row.K16_b > 0 else 100.0,
+                              row.K17_a, row.K17_b, row.K17_a * 100.0 / row.K17_b if row.K17_b > 0 else 100.0]
+            category_ho.append(l_ho)
+            l_tv = [row.date, row.K01, row.K02, row.K03, row.K04, row.K05, row.K06, row.K07]
+            category_tv.append(l_tv)
+
+        dc_total = ['total', sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0, 
+                      sum_columns['SK20_a'], sum_columns['SK20_b'], sum_columns['SK20_a'] * 100.0 / sum_columns['SK20_b'] if sum_columns['SK20_b'] > 0 else 0, 
+                      sum_columns['SK21_a'], sum_columns['SK21_b'], sum_columns['SK21_a'] * 100.0 / sum_columns['SK21_b'] if sum_columns['SK21_b'] > 0 else 0]                      
+        category_dc.append(dc_total)
+        ho_total = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 100.0,
+                             sum_columns['SK16_a'], sum_columns['SK16_b'], sum_columns['SK16_a'] * 100.0 / sum_columns['SK16_b'] if sum_columns['SK16_b'] > 0 else 100.0,
+                             sum_columns['SK17_a'], sum_columns['SK17_b'], sum_columns['SK17_a'] * 100.0 / sum_columns['SK17_b'] if sum_columns['SK17_b'] > 0 else 100.0]
+        category_ho.append(ho_total)
+        tv_total = ['total', sum_columns['SK01'], sum_columns['SK02'], sum_columns['SK03'], sum_columns['SK04'], sum_columns['SK05'], sum_columns['SK06'], sum_columns['SK07']]
+        category_tv.append(tv_total)
+        dc_headers = ['Cell Name', 'Date', 'Sys Rls AMR', 'All Rls AMR', 'DCR AMR',
+                      'Sys Rls VP', 'All Rls VP', 'DCR VP',
+                      'Sys Rls PS', 'All Rls PS', 'DCR PS R99']
+        ho_headers = ['Cell Name', 'Date', 'IRAT HO Ss', 'IRAT HO Rt', 'IRAT HO SRate', 
+                      'ASet Update Ss', 'ASet Update Rt', 'Soft Ho SRate',
+                      'IF HO Ss', 'IF HO Rt', 'IF Ho SRate']
+        tv_headers = ['Cell Name', 'Date', 'AMR TV', 'CS TV', 'VP TV', 'PS UL Thrg', 'PS DL Thrg', 'EUL UL Thrg', 'HSDPA DL Thrg']
+        return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv})
     return render_to_response('404.html')
 	
 class CellNameForm(forms.Form):
