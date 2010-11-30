@@ -39,31 +39,32 @@ $(document).ready(function() {
 
 </head>
 <body>
-<!-- <form action="/polls/celldetail/" method="post"> -->
-<a href="/"><img src="/polls/site_media/logo.png" alt=""  /></a> 
-<form action="/polls/search/" method="post">
-{% csrf_token %}
-	<input type="text" class="ac_input" id="suggest" name="cellname" maxlength="255" size="75"/>
-	  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
-	    <ul style="overflow: auto; max-height: 180px;">
-	       <li class="ac_even"></li>
-	       <li class="ac_odd"></li>
-	    </ul>
-	  </div>
-	<input type="submit" value="Search" class="btn" />
-</form>
-
-{% block shortcuts %}
-    {% include 'shortcuts.html' %}
-{% endblock %}
-
-{% block footer %}
-<div class="legal">
- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-    &copy; 2010 <a href="mailto:huzhili@gmail.com">huzhili@gmail.com</a>
-    <br />
-</div>
-{% endblock %}
-
+	<center>
+		<br><br><br>
+		<a href="/"><img src="/polls/site_media/logo.png" alt=""  /></a>
+		<br><br> 
+		<form action="/polls/search/" method="post">
+		{% csrf_token %}
+			<input type="text" class="ac_input" id="suggest" name="cellname" maxlength="255" size="55" style="font:18px arial,sans-serif bold;height:25px"/>
+			  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
+			    <ul style="overflow: auto; max-height: 180px;">
+			       <li class="ac_even"></li>
+			       <li class="ac_odd"></li>
+			    </ul>
+			  </div>
+			<input type="submit" value="Search" class="btn" />
+		</form>
+		<br>
+		{% block shortcuts %}
+		    {% include 'shortcuts.html' %}
+		{% endblock %}
+		{% block footer %}
+		<div class="legal">
+		 <br><br><br><br><br><br>
+		    &copy; 2010 <a href="mailto:huzhili@gmail.com">huzhili@gmail.com</a>
+		    <br>
+		</div>
+		{% endblock %}
+	</center>
 </body>
 </html>

@@ -293,7 +293,7 @@ def worst_cells(request, ratetype):
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-date','-rate')[:30]
+	    kpi_list = KPI.objects.filter(K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-date','-K19_a','-rate')[:30]
 	    title ='Drop Call Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
     elif ratetype == 'irat_ho':
@@ -409,7 +409,7 @@ def changedate(request, ratetype):
                 for kp in rnc_kpi_list:
                     l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
                     rnc_kpi.append(l)
-                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:30]
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-K19_a','-rate')[:30]
                 title ='Drop Call Rate'
                 column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
             elif ratetype == 'irat_ho':
