@@ -373,7 +373,7 @@ def results(request, cellname):
         ho_headers = ['Cell Name', 'Date', 'IRAT HO Ss', 'IRAT HO Rt', 'IRAT HO SRate', 
                       'ASet Update Ss', 'ASet Update Rt', 'Soft Ho SRate',
                       'IF HO Ss', 'IF HO Rt', 'IF Ho SRate']
-        tv_headers = ['Cell Name', 'Date', 'AMR TV', 'CS TV', 'VP TV', 'PS UL Thrg', 'PS DL Thrg', 'EUL UL Thrg', 'HSDPA DL Thrg']
+        tv_headers = ['Cell Name', 'Date', 'AMR TV', 'VP TV', 'CS TV', 'PS UL Thrg', 'PS DL Thrg', 'EUL UL Thrg', 'HSDPA DL Thrg']
         return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv})
     return render_to_response('404.html')
 	
