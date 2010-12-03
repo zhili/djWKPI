@@ -16,6 +16,8 @@
 	<script src="/polls/site_media/jquery.ui.tabs.js"></script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
+			var table_initialised = false;
+			var oTable4;
 			$("#tabs").tabs( {
 							"show": function(event, ui) {
 								var oTable = $('div.dataTables_scrollBody>table.display', ui.panel).dataTable();
@@ -39,6 +41,36 @@
 								// 	{ "sWidth": "10%", "aTargets": [ -1 ] }
 								// ]
 							} );
+			$('#tabs').bind('tabsselect', function(event, ui) {
+
+				if (ui.index == 3) {
+					if (table_initialised == false) {
+					    //build the table from scratch
+					    table_initialised = true;
+						// $.fn.dataTableExt.iApiIndex = 1;  
+				 		oTable4 = $('table.extra').dataTable({
+							"sDom": '<"H"Cfr>t<"F"ip>',
+							// "sScrollX": "100%",
+							// "sScrollXInner": "110%",
+							"bScrollCollapse": true,
+							"bPaginate": false,
+							"bJQueryUI": true,
+							"aaSorting": [],
+							"oLanguage": {
+								"sSearch": "Custom filter:"
+							},
+							"bProcessing": true,
+							"bServerSide": true,
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}"
+						});
+
+						console.log("tab 4 clicked!")
+					} else {
+					    //redraw the table
+					    // oTable4.fnDraw();
+					}
+				};
+			  });
 		} );
 	</script>
 	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
@@ -67,6 +99,7 @@
 				<li><a href="#tabs-1">Drop Call</a></li> 
 				<li><a href="#tabs-2">HandOver</a></li> 
 				<li><a href="#tabs-3">Traffic Vol</a></li>
+				<li><a href="#tabs-4">HSPA</a></li>
 			</ul>
 			<div id="tabs-1"> 
 				<table cellspacing="0" cellspacing="0" border="0" class="display" id="example1">
@@ -133,6 +166,22 @@
 								{% endfor %}
 							 </tr> 
 						{% endfor %}
+
+					</tbody>
+				</table>
+			</div>
+			<div id="tabs-4">
+				<table cellspacing="0" cellspacing="0" border="0" class="extra" id="example4">
+					<thead> 
+						<tr>
+							<tr> 		
+						    {% for col in dc_head %}
+						    	<th>{{col}}</th>
+						    {% endfor %}
+							</tr>	
+						</tr> 
+					</thead>
+					<tbody>
 
 					</tbody>
 				</table>

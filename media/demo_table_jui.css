@@ -69,7 +69,13 @@ table.display thead th {
 	cursor: pointer;
 	* cursor: hand;
 }
-
+/* begin extra*/
+table.extra thead th {
+	padding: 3px 0px 3px 10px;
+	cursor: pointer;
+	* cursor: hand;
+}
+/* end extra */
 
 /*
  * Sort arrow icon positioning
@@ -88,7 +94,23 @@ table.display thead th div.DataTables_sort_wrapper span {
 }
 
 
+/* begin extra*/
+/*
+ * Sort arrow icon positioning
+ */
+table.extra thead th div.DataTables_sort_wrapper {
+	position: relative;
+	padding-right: 20px;
+	padding-right: 20px;
+}
 
+table.extra thead th div.DataTables_sort_wrapper span {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+	right: 0;
+}
+/* end extra */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -198,7 +220,35 @@ table.display td.center {
 	text-align: center;
 }
 
+/* begin extra */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables display
+ */
+table.extra {
+	margin: 0 auto;
+	width: 100%;
+	clear: both;
+	border-collapse: collapse;
+}
 
+table.extra tfoot th {
+	padding: 3px 0px 3px 10px;
+	font-weight: bold;
+	font-weight: normal;
+}
+
+table.extra tr.heading2 td {
+	border-bottom: 1px solid #aaa;
+}
+
+table.extra td {
+	padding: 3px 10px;
+}
+
+table.extra td.center {
+	text-align: center;
+}
+/* end extra */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables sorting
@@ -266,6 +316,41 @@ table.display tr.even.gradeU {
 }
 
 
+/* begin extra */
+
+table.extra tr.odd.gradeA {
+	background-color: #ddffdd;
+}
+
+table.extra tr.even.gradeA {
+	background-color: #eeffee;
+}
+
+table.extra tr.odd.gradeC {
+	background-color: #ddddff;
+}
+
+table.extra tr.even.gradeC {
+	background-color: #eeeeff;
+}
+
+table.extra tr.odd.gradeX {
+	background-color: #ffdddd;
+}
+
+table.extra tr.even.gradeX {
+	background-color: #ffeeee;
+}
+
+table.extra tr.odd.gradeU {
+	background-color: #ddd;
+}
+
+table.extra tr.even.gradeU {
+	background-color: #eee;
+}
+/* end extra */
+
 tr.odd {
 	background-color: #E2E4FF;
 }
@@ -273,8 +358,6 @@ tr.odd {
 tr.even {
 	background-color: white;
 }
-
-
 
 
 
@@ -360,7 +443,15 @@ table.display tr.odd.row_selected td {
 	background-color: #9FAFD1;
 }
 
+/* begin extra */
+table.extra tr.even.row_selected td {
+	background-color: #B0BED9;
+}
 
+table.extra tr.odd.row_selected td {
+	background-color: #9FAFD1;
+}
+/*end extra*/
 /*
  * Sorting classes for columns
  */

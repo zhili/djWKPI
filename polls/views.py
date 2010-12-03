@@ -118,22 +118,11 @@ def handle_uploaded_file(f):
     ucell.kpi_set.add(kpi)
     return True
 
-import StringIO
+
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import simplejson
 @csrf_exempt
 def upload(request):
-
     if request.method == 'POST':
-        # print request.is_ajax()
-        # print request.META['HTTP_X_FILE_NAME']
-        # with io.BufferedReader( io.BytesIO( request.raw_post_data) ) as stream:
-        #      with io.BufferedWriter( io.FileIO( "/tmp/%s" % request.META['HTTP_X_FILE_NAME'], "wb" ) ) as destination:
-        #           foo = stream.read( 1024 )
-        #           while foo:
-        #               destination.write( foo )
-        #               foo = stream.read( 1024 )
-        # print  request.POST
         # data =  request.FILES['qqfile']
         #        print data.name
         # form = UploadFileForm(request.POST, request.FILES)
@@ -143,13 +132,16 @@ def upload(request):
         # 	            # !!!not safe!!!
         # 	            return render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
         # return HttpResponseRedirect('/admin/')
-        pseudofile = StringIO.StringIO(request.raw_post_data)
-        if (False == handle_uploaded_file(pseudofile)):
-            HttpResponse(simplejson.dumps({"error":"error message to display"}))
-        return HttpResponse(simplejson.dumps({"success": "true"}))
+        # print 'at post'
+        for field_name in request.FILES:
+            uploaded_file = request.FILES[field_name]
+            if (False == handle_uploaded_file(uploaded_file)):
+                return render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
+        # indicate that everything is OK for SWFUpload
+        return HttpResponse("ok", mimetype="text/plain")
+
     return render_to_response(
-        "admin/upload.html",
-        RequestContext(request),
+        "admin/upload.html", context_instance=RequestContext(request)
     )
 
 # report = staff_member_required(upload)
@@ -423,3 +415,33 @@ def changedate(request, ratetype):
     	    else: # 404
 			    return render_to_response('404.html') 
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
+
+def loadExtraData(request, cellname):
+    print 'extra'
+    if Cell.objects.filter(cell_name=cellname).exists():
+        
+	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
+        my_cell = Cell.objects.get(cell_name=cellname)
+        today = date.today() + timedelta(days=1)
+        my_cell = Cell.objects.get(cell_name=cellname)
+        today = date.today() + timedelta(days=1)
+        begin = today - timedelta(days=15)
+        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), 
+                                             SK20_a=Sum('K20_a'), SK20_b=Sum('K20_b'), SK21_a=Sum('K21_a'), SK21_b=Sum('K21_b'),
+                                             SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'),
+                                             SK17_a=Sum('K17_a'), SK17_b=Sum('K17_b'), SK06=Sum('K06'), SK07=Sum('K07'),
+                                             SK01=Sum('K01'), SK02=Sum('K02'), SK03=Sum('K03'), SK04=Sum('K04'), SK05=Sum('K05'))
+        kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
+        aaData = []
+        for row in kset:
+            l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
+                              row.K20_a, row.K20_b, row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0, 
+                              row.K21_a, row.K21_b, row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0]
+            aaData.append(l_dc)
+        response_dict = {}
+        response_dict.update({'aaData':aaData})
+	    # response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+        response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+    else:
+        response = HttpResponse(simplejson.dumps({"success": "false"}))
+    return response

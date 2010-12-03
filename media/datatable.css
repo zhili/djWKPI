@@ -97,7 +97,26 @@ table.display {
 	 * then filling in the gaps with other borders.
 	 */
 }
-
+/*begin extra*/
+table.extra {
+	margin: 0 auto;
+	clear: both;
+	width: 100%;
+	
+	/* Note Firefox 3.5 and before have a bug with border-collapse
+	 * ( https://bugzilla.mozilla.org/show%5Fbug.cgi?id=155955 ) 
+	 * border-spacing: 0; is one possible option. Conditional-css.com is
+	 * useful for this kind of thing
+	 *
+	 * Further note IE 6/7 has problems when calculating widths with border width.
+	 * It subtracts one px relative to the other browsers from the first column, and
+	 * adds one to the end...
+	 *
+	 * If you want that effect I'd suggest setting a border-top/left on th/td's and 
+	 * then filling in the gaps with other borders.
+	 */
+}
+/*end extra*/
 /*table.display thead th {
 	padding: 3px 18px 3px 10px;
 	border-bottom: 1px solid black;
@@ -148,6 +167,31 @@ table.display tbody tr.odd td {
 	background-color:#F0F0F6;
 }
 
+/*begin extra*/
+table.extra thead tr th, table.tablesorter tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+}
+table.extra thead tr .header {
+	background-image: url(bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+
+table.extra tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+	font-size: 8pt;
+}
+table.extra tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+/*end extra*/
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables sorting
  */
@@ -212,6 +256,39 @@ table.display tr.even.gradeU {
 }
 
 
+/* begin extra*/
+table.extra tr.odd.gradeA {
+	background-color: #ddffdd;
+}
+
+table.extra  tr.even.gradeA {
+	background-color: #eeffee;
+}
+
+table.extra  tr.odd.gradeC {
+	background-color: #ddddff;
+}
+
+table.extra  tr.even.gradeC {
+	background-color: #eeeeff;
+}
+
+table.extra  tr.odd.gradeX {
+	background-color: #ffdddd;
+}
+
+table.extra  tr.even.gradeX {
+	background-color: #ffeeee;
+}
+
+table.extra  tr.odd.gradeU {
+	background-color: #ddd;
+}
+
+table.extra  tr.even.gradeU {
+	background-color: #eee;
+}
+/*end extra*/
 tr.odd {
 	background-color: #E2E4FF;
 }
@@ -316,7 +393,15 @@ table.display tr.odd.row_selected td {
 	background-color: #9FAFD1;
 }
 
+/*begin extra*/
+table.extra tr.even.row_selected td {
+	background-color: #B0BED9;
+}
 
+table.extra tr.odd.row_selected td {
+	background-color: #9FAFD1;
+}
+/*end extra*/
 /*
  * Sorting classes for columns
  */
@@ -524,6 +609,23 @@ table.display tr.gradeU {
 	background-color: #ddd;
 }
 
+/*begin extra */
+table.extra tr.gradeA {
+	background-color: #eeffee;
+}
+
+table.extra tr.gradeC {
+	background-color: #ddddff;
+}
+
+table.extra tr.gradeX {
+	background-color: #ffdddd;
+}
+
+table.extra tr.gradeU {
+	background-color: #ddd;
+}
+/*end extra*/
 div.box {
 	height: 50px;
 	padding: 10px;
