@@ -1,4 +1,11 @@
-# Create your views here.
+# # 
+#  views.py
+#  mysite
+#  
+#  Created by zhili hu on 2010-12-04.
+#  Copyright 2010 __MyCompanyName__. All rights reserved.
+# 
+
 from django.http import HttpResponseRedirect, HttpResponse
 from polls.models import Cell, KPI
 from django.template import Context, loader
@@ -7,12 +14,6 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-def index(request):
-    t = loader.get_template('index.html')
-    c = Context({
-        # 'latest_poll_list': latest_poll_list,
-    })
-    return HttpResponse(t.render(c))
 
 from django import forms
 from datetime import datetime
@@ -416,16 +417,19 @@ def changedate(request, ratetype):
 			    return render_to_response('404.html') 
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
 
+from django.utils import simplejson
 def loadExtraData(request, cellname):
-    print 'extra'
+
     if Cell.objects.filter(cell_name=cellname).exists():
         
 	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
+        sEcho = int(request.GET.get('sEcho',0))
+	    # cols = int(request.GET.get('iColumns',0)) 
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
-        begin = today - timedelta(days=15)
+        begin = today - timedelta(days=7)
         sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), 
                                              SK20_a=Sum('K20_a'), SK20_b=Sum('K20_b'), SK21_a=Sum('K21_a'), SK21_b=Sum('K21_b'),
                                              SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'),
@@ -438,9 +442,10 @@ def loadExtraData(request, cellname):
                               row.K20_a, row.K20_b, row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0, 
                               row.K21_a, row.K21_b, row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0]
             aaData.append(l_dc)
+        iTotalRecords = iTotalDisplayRecords =  kset.count()
         response_dict = {}
         response_dict.update({'aaData':aaData})
-	    # response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
+        response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords})
         response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
     else:
         response = HttpResponse(simplejson.dumps({"success": "false"}))

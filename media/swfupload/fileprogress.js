@@ -32,7 +32,7 @@ function FileProgress(file, targetID) {
 
 		var progressText = document.createElement("div");
 		progressText.className = "progressName";
-		progressText.appendChild(document.createTextNode(file.name));
+		progressText.appendChild(document.createTextNode('File: ' + file.name + '('+Math.round(file.size/1024)+' KB)'));
 
 		var progressBar = document.createElement("div");
 		progressBar.className = "progressBarInProgress";
