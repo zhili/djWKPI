@@ -236,37 +236,49 @@ def chart_data(request, cellname):
     x.labels = xlbls
     chart.x_axis = x
 
-    l_K18 = line_hollow()
+    l_K18 = line()
     l_K18.colour = "#3133C0"
     l_K18.width = 4
-    l_K18.halo_size = 2
+    # l_K18.halo_size = 2
     # l_K18.dot_size = 4
     l_K18.tip = '#key#  #val#'
     l_K18.text = 'IRAT HO'
     l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 100.0 for item in cell_kpi_set]
+    l_K18.font_size = 14
 
-    l_K19 = line_hollow()
+    l_K19 = bar()
     l_K19.colour = "#00FF00"
     l_K19.width = 4
     # l.halo_size = 10
-    l_K19.dot_size = 4
+    # l_K19.dot_size = 4
     l_K19.tip = '#key#  #val#'
-    l_K19.text = 'Drop Call'
+    l_K19.text = 'DCR AMR'
     l_K19.values = [float(item.K19_a * 100.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
+    l_K19.font_size = 14
 
-    l_K16 = line_hollow()
-    l_K16.colour = "#A60289"
-    l_K16.width = 4
-    l_K16.halo_size = 2
+    l_K26 = bar()
+    l_K26.colour = "#A60289"
+    l_K26.width = 4
+    # l_K26.halo_size = 2
     # l_K18.dot_size = 4
-    l_K16.tip = '#key#  #val#'
-    l_K16.text = 'Soft HO'
-    l_K16.values = [float(item.K16_a * 100.0 / item.K16_b) if item.K16_b > 0 else 100.0 for item in cell_kpi_set]
+    l_K26.tip = '#key#  #val#'
+    l_K26.text = 'DCR HSDPA'
+    l_K26.values = [float(item.K26_a * 100.0 / item.K26_b) if item.K26_b > 0 else 0 for item in cell_kpi_set]
+    l_K26.font_size = 14
 
+    l_K31 = bar()
+    l_K31.colour = "#FF2626"
+    l_K31.width = 4
+    # l_K31.halo_size = 2
+    # l_K18.dot_size = 4
+    l_K31.tip = '#key#  #val#'
+    l_K31.text = 'DCR HSUPA'
+    l_K31.values = [float(item.K31_a * 100.0 / item.K31_b) if item.K31_b > 0 else 0 for item in cell_kpi_set]
 
     chart.add_element(l_K18)
     chart.add_element(l_K19)
-    chart.add_element(l_K16)
+    chart.add_element(l_K26)
+    chart.add_element(l_K31)
     return HttpResponse(chart.render())
 
 from datetime import date
@@ -315,11 +327,13 @@ def tag_autocomplete(request):
         form = CellNameForm(request.POST) # A form bound to the POST data
         if form.is_valid():
             cn = form.cleaned_data['cellname']
-            # print cn
-            return HttpResponseRedirect(reverse('polls.views.results', args=(cn,)))
+ 
+            return HttpResponseRedirect(reverse('polls.views.results', args=(cn.rstrip(),)))
     return render_to_response('search.html', RequestContext(request))
 
 
+def prettyfloat(number):
+    return "%0.2f" % number  # Works the same.
 
 def results(request, cellname):
     # print my_cell
@@ -328,7 +342,7 @@ def results(request, cellname):
 	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
-        begin = today - timedelta(days=7)
+        begin = today - timedelta(days=10)
         sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), 
                                              SK20_a=Sum('K20_a'), SK20_b=Sum('K20_b'), SK21_a=Sum('K21_a'), SK21_b=Sum('K21_b'),
                                              SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'),
@@ -339,26 +353,26 @@ def results(request, cellname):
         category_ho = []
         category_tv = []
         for row in kset:
-            l_dc = [row.date, row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
-                              row.K20_a, row.K20_b, row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0, 
-                              row.K21_a, row.K21_b, row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0]
+            l_dc = [row.date, row.K19_a, row.K19_b, prettyfloat(row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0), 
+                              row.K20_a, row.K20_b, prettyfloat(row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0), 
+                              row.K21_a, row.K21_b, prettyfloat(row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0)]
             category_dc.append(l_dc)
-            l_ho = [row.date, row.K18_a, row.K18_b, row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 100.0, 
-                              row.K16_a, row.K16_b, row.K16_a * 100.0 / row.K16_b if row.K16_b > 0 else 100.0,
-                              row.K17_a, row.K17_b, row.K17_a * 100.0 / row.K17_b if row.K17_b > 0 else 100.0]
+            l_ho = [row.date, row.K18_a, row.K18_b, prettyfloat(row.K18_a * 100.0 / row.K18_b if row.K18_b > 0 else 100.0), 
+                              row.K16_a, row.K16_b, prettyfloat(row.K16_a * 100.0 / row.K16_b if row.K16_b > 0 else 100.0),
+                              row.K17_a, row.K17_b, prettyfloat(row.K17_a * 100.0 / row.K17_b if row.K17_b > 0 else 100.0)]
             category_ho.append(l_ho)
-            l_tv = [row.date, row.K01, row.K02, row.K03, row.K04, row.K05, row.K06, row.K07]
+            l_tv = [row.date, prettyfloat(row.K01), prettyfloat(row.K02), prettyfloat(row.K03), prettyfloat(row.K04), prettyfloat(row.K05), prettyfloat(row.K06), prettyfloat(row.K07)]
             category_tv.append(l_tv)
 
-        dc_total = ['total', sum_columns['SK19_a'], sum_columns['SK19_b'], sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0, 
-                      sum_columns['SK20_a'], sum_columns['SK20_b'], sum_columns['SK20_a'] * 100.0 / sum_columns['SK20_b'] if sum_columns['SK20_b'] > 0 else 0, 
-                      sum_columns['SK21_a'], sum_columns['SK21_b'], sum_columns['SK21_a'] * 100.0 / sum_columns['SK21_b'] if sum_columns['SK21_b'] > 0 else 0]                      
+        dc_total = ['total', sum_columns['SK19_a'], sum_columns['SK19_b'], prettyfloat(sum_columns['SK19_a'] * 100.0 / sum_columns['SK19_b'] if sum_columns['SK19_b'] > 0 else 0), 
+                      sum_columns['SK20_a'], sum_columns['SK20_b'], prettyfloat(sum_columns['SK20_a'] * 100.0 / sum_columns['SK20_b'] if sum_columns['SK20_b'] > 0 else 0), 
+                      sum_columns['SK21_a'], sum_columns['SK21_b'], prettyfloat(sum_columns['SK21_a'] * 100.0 / sum_columns['SK21_b'] if sum_columns['SK21_b'] > 0 else 0)]                      
         category_dc.append(dc_total)
-        ho_total = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 100.0,
-                             sum_columns['SK16_a'], sum_columns['SK16_b'], sum_columns['SK16_a'] * 100.0 / sum_columns['SK16_b'] if sum_columns['SK16_b'] > 0 else 100.0,
-                             sum_columns['SK17_a'], sum_columns['SK17_b'], sum_columns['SK17_a'] * 100.0 / sum_columns['SK17_b'] if sum_columns['SK17_b'] > 0 else 100.0]
+        ho_total = ['total', sum_columns['SK18_a'], sum_columns['SK18_b'], prettyfloat(sum_columns['SK18_a'] * 100.0 / sum_columns['SK18_b'] if sum_columns['SK18_b'] > 0 else 100.0),
+                             sum_columns['SK16_a'], sum_columns['SK16_b'], prettyfloat(sum_columns['SK16_a'] * 100.0 / sum_columns['SK16_b'] if sum_columns['SK16_b'] > 0 else 100.0),
+                             sum_columns['SK17_a'], sum_columns['SK17_b'], prettyfloat(sum_columns['SK17_a'] * 100.0 / sum_columns['SK17_b'] if sum_columns['SK17_b'] > 0 else 100.0)]
         category_ho.append(ho_total)
-        tv_total = ['total', sum_columns['SK01'], sum_columns['SK02'], sum_columns['SK03'], sum_columns['SK04'], sum_columns['SK05'], sum_columns['SK06'], sum_columns['SK07']]
+        tv_total = ['total', prettyfloat(sum_columns['SK01']), prettyfloat(sum_columns['SK02']), prettyfloat(sum_columns['SK03']), prettyfloat(sum_columns['SK04']), prettyfloat(sum_columns['SK05']), prettyfloat(sum_columns['SK06']), prettyfloat(sum_columns['SK07'])]
         category_tv.append(tv_total)
         dc_headers = ['Cell Name', 'Date', 'Sys Rls AMR', 'All Rls AMR', 'DCR AMR',
                       'Sys Rls VP', 'All Rls VP', 'DCR VP',
@@ -367,7 +381,9 @@ def results(request, cellname):
                       'ASet Update Ss', 'ASet Update Rt', 'Soft Ho SRate',
                       'IF HO Ss', 'IF HO Rt', 'IF Ho SRate']
         tv_headers = ['Cell Name', 'Date', 'AMR TV', 'VP TV', 'CS TV', 'PS UL Thrg', 'PS DL Thrg', 'EUL UL Thrg', 'HSDPA DL Thrg']
-        return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv})
+        hsdpa_headers = ['Cell Name', 'Date', 'Sys Rls HS-DSCH', 'All Rls HS-DSCH', 'DCR HSDPA', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att','RAB EST SRate(HSDPA)', 'HSDPA RLC TV(Mbytes)', 'HSDPA RLC Thrg(kbps)', 'Avg HSDPA user', 'Iu-PS DL TV(MB)']
+        hsupa_headers = ['Cell Name', 'Date', 'Sys Rls E-DCH', 'All Rls E-DCH', 'DCR (HSUPA)', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)', 'HSUPA RLC TV(Mbytes)', 'HSUPA RLC Thrg(kbps)', 'Avg HSUPA user', 'Iu-PS UL TV(MB)']	
+        return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv, 'hsdpa_head':hsdpa_headers, 'hsupa_head':hsupa_headers})
     return render_to_response('404.html')
 	
 class CellNameForm(forms.Form):
@@ -418,34 +434,57 @@ def changedate(request, ratetype):
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
 
 from django.utils import simplejson
-def loadExtraData(request, cellname):
+def loadExtraData(request, cellname, data_id):
 
     if Cell.objects.filter(cell_name=cellname).exists():
         
-	    # KPI.objects.values('ucell_id').order_by().annotate(Sum('K01'), Sum('K02'))
         sEcho = int(request.GET.get('sEcho',0))
 	    # cols = int(request.GET.get('iColumns',0)) 
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
-        begin = today - timedelta(days=7)
-        sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK19_a=Sum('K19_a'), SK19_b=Sum('K19_b'), 
-                                             SK20_a=Sum('K20_a'), SK20_b=Sum('K20_b'), SK21_a=Sum('K21_a'), SK21_b=Sum('K21_b'),
-                                             SK18_a=Sum('K18_a'), SK18_b=Sum('K18_b'), SK16_a=Sum('K16_a'), SK16_b=Sum('K16_b'),
-                                             SK17_a=Sum('K17_a'), SK17_b=Sum('K17_b'), SK06=Sum('K06'), SK07=Sum('K07'),
-                                             SK01=Sum('K01'), SK02=Sum('K02'), SK03=Sum('K03'), SK04=Sum('K04'), SK05=Sum('K05'))
-        kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
+        begin = today - timedelta(days=10)
         aaData = []
-        for row in kset:
-            l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K19_a, row.K19_b, row.K19_a * 100.0 / row.K19_b if row.K19_b > 0 else 0, 
-                              row.K20_a, row.K20_b, row.K20_a * 100.0 / row.K20_b if row.K20_b > 0 else 0, 
-                              row.K21_a, row.K21_b, row.K21_a * 100.0 / row.K21_b if row.K21_b > 0 else 0]
-            aaData.append(l_dc)
-        iTotalRecords = iTotalDisplayRecords =  kset.count()
+        if data_id == '1':
+
+            sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK26_a=Sum('K26_a'), SK26_b=Sum('K26_b'), 
+                                             SK25_a=Sum('K25_a'), SK25_b=Sum('K25_b'), SK22_ucell=Sum('K22_ucell'), SK23=Sum('K23'),
+                                             SK24=Sum('K24'), SK34_ucell=Sum('K34_ucell'))
+            kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
+
+            for row in kset:
+                l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K26_a, row.K26_b, prettyfloat(row.K26_a * 100.0 / row.K26_b if row.K26_b > 0 else 0), 
+                              row.K25_a, row.K25_b, prettyfloat(row.K25_a * 100.0 / row.K25_b if row.K25_b > 0 else 100.0), 
+                              prettyfloat(row.K22_ucell), prettyfloat(row.K23), prettyfloat(row.K24), prettyfloat(row.K34_ucell)]
+                aaData.append(l_dc)
+            hsdpa_total = [cellname,'total', sum_columns['SK26_a'], sum_columns['SK26_b'], prettyfloat(sum_columns['SK26_a'] * 100.0 / sum_columns['SK26_b'] if sum_columns['SK26_b'] > 0 else 0),
+                                 sum_columns['SK25_a'], sum_columns['SK25_b'], prettyfloat(sum_columns['SK25_a'] * 100.0 / sum_columns['SK25_b'] if sum_columns['SK25_b'] > 0 else 100.0),
+                                prettyfloat(sum_columns['SK22_ucell']), prettyfloat(sum_columns['SK23']), prettyfloat(sum_columns['SK24']), prettyfloat(sum_columns['SK34_ucell'])]
+            aaData.append(hsdpa_total)
+            iTotalRecords = iTotalDisplayRecords =  kset.count() + 1
+        elif data_id == '2':
+
+            sum_columns = my_cell.kpi_set.filter(date__range=(begin, today)).aggregate(SK31_a=Sum('K31_a'), SK31_b=Sum('K31_b'), 
+                                             SK30_a=Sum('K30_a'), SK30_b=Sum('K30_b'), SK27=Sum('K27'), SK28=Sum('K28'),
+                                             SK29=Sum('K29'), SK33_ucell=Sum('K33_ucell'))
+            kset = my_cell.kpi_set.filter(date__range=(begin, today)).order_by('date')
+            for row in kset:
+                l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K31_a, row.K31_b, prettyfloat(row.K31_a * 100.0 / row.K31_b if row.K31_b > 0 else 0), 
+                              row.K30_a, row.K30_b, prettyfloat(row.K30_a * 100.0 / row.K30_b if row.K30_b > 0 else 100), 
+                              prettyfloat(row.K27), prettyfloat(row.K28), prettyfloat(row.K29), prettyfloat(row.K33_ucell)]
+                aaData.append(l_dc)
+            hsupa_total = [cellname,'total', sum_columns['SK31_a'], sum_columns['SK31_b'], prettyfloat(sum_columns['SK31_a'] * 100.0 / sum_columns['SK31_b'] if sum_columns['SK31_b'] > 0 else 0),
+                                 sum_columns['SK30_a'], sum_columns['SK30_b'], prettyfloat(sum_columns['SK30_a'] * 100.0 / sum_columns['SK30_b'] if sum_columns['SK30_b'] > 0 else 100),
+                                 prettyfloat(sum_columns['SK27']), prettyfloat(sum_columns['SK28']), prettyfloat(sum_columns['SK29']), prettyfloat(sum_columns['SK33_ucell'])]
+            aaData.append(hsupa_total)
+            iTotalRecords = iTotalDisplayRecords =  kset.count() + 1
+        else:
+            None
         response_dict = {}
         response_dict.update({'aaData':aaData})
         response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords})
+
         response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
     else:
         response = HttpResponse(simplejson.dumps({"success": "false"}))

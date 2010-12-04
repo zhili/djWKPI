@@ -30,6 +30,7 @@
 .dataTables_length {
 	width: 14%;
 	float: left;
+	text-align: left;
 }
 
 .dataTables_filter {

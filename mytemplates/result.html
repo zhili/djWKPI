@@ -16,13 +16,17 @@
 	<script src="/polls/site_media/jquery.ui.tabs.js"></script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
-			var table_initialised = false;
-			var oTable4;
+			var table_initialised4 = false;var table_initialised5 = false;
+			var oTable4; var oTable5;
 			$("#tabs").tabs( {
 							"show": function(event, ui) {
 								var oTable = $('div.dataTables_scrollBody>table.display', ui.panel).dataTable();
 								if ( oTable.length > 0 ) {
 									oTable.fnAdjustColumnSizing();
+								}
+								var oTable1 = $('div.dataTables_scrollBody>table.extra', ui.panel).dataTable();
+								if ( oTable1.length > 0 ) {
+									oTable1.fnAdjustColumnSizing();
 								}
 							}
 						} );
@@ -34,9 +38,10 @@
 								"bPaginate": false,
 								"bJQueryUI": true,
 								"aaSorting": [],
-								"oLanguage": {
-								"sSearch": "Custom filter:"
-								},
+								// "oLanguage": {
+								// "sSearch": "Custom filter:"
+								// },
+								"bFilter": false,
 								// "aoColumnDefs": [
 								// 	{ "sWidth": "10%", "aTargets": [ -1 ] }
 								// ]
@@ -44,32 +49,58 @@
 			$('#tabs').bind('tabsselect', function(event, ui) {
 
 				if (ui.index == 3) {
-					if (table_initialised == false) {
+					if (table_initialised4 == false) {
 					    //build the table from scratch
-					    table_initialised = true;
+					    table_initialised4 = true;
 						// $.fn.dataTableExt.iApiIndex = 1;  
-				 		oTable4 = $('table.extra').dataTable({
+				 		oTable4 = $('#example4').dataTable({
 							"sDom": '<"H"Cfr>t<"F"ip>',
-							// "sScrollX": "100%",
-							// "sScrollXInner": "110%",
+							"sScrollX": "100%",
+							"sScrollXInner": "134%",
 							"bScrollCollapse": true,
 							"bPaginate": false,
 							"bJQueryUI": true,
 							"aaSorting": [],
-							"oLanguage": {
-								"sSearch": "Custom filter:"
-							},
+							// "oLanguage": {
+							// 	"sSearch": "Custom filter:"
+							// },
+							"bFilter": false,
 							"bProcessing": true,
 							"bServerSide": true,
-							"sAjaxSource": "/polls/extrajson/{{cell_name}}"
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/1/"
 						});
-
-						console.log("tab 4 clicked!")
 					} else {
 					    //redraw the table
 					    // oTable4.fnDraw();
 					}
 				};
+				if (ui.index == 4) {
+					if (table_initialised5 == false) {
+					    //build the table from scratch
+					    table_initialised5 = true;
+						// $.fn.dataTableExt.iApiIndex = 1;  
+				 		oTable5 = $('#example5').dataTable({
+							"sDom": '<"H"Cfr>t<"F"ip>',
+							"sScrollX": "100%",
+							"sScrollXInner": "127%",
+							"bScrollCollapse": true,
+							"bPaginate": false,
+							"bJQueryUI": true,
+							"aaSorting": [],
+							// "oLanguage": {
+							// 	"sSearch": "Custom filter:"
+							// },
+							"bFilter": false,
+							"bProcessing": true,
+							"bServerSide": true,
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/2/"
+						});
+					} else {
+					    //redraw the table
+					    // oTable4.fnDraw();
+					}
+				};
+				
 			  });
 		} );
 	</script>
@@ -81,7 +112,7 @@
     	//   {"data-file":"/polls/{{cell_name}}/data/"} );
     	swfobject.embedSWF(
     	  "/polls/site_media/open-flash-chart.swf", "chart_me",
-    	  "600", "400", "9.0.0", "/polls/site_media/expressInstall.swf",
+    	  "700", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
     	  {"data-file":"/polls/{{cell_name}}/data/"} );
     	// swfobject.embedSWF(
     	//   "/polls/site_media/open-flash-chart.swf", "chart_irat",
@@ -99,7 +130,8 @@
 				<li><a href="#tabs-1">Drop Call</a></li> 
 				<li><a href="#tabs-2">HandOver</a></li> 
 				<li><a href="#tabs-3">Traffic Vol</a></li>
-				<li><a href="#tabs-4">HSPA</a></li>
+				<li><a href="#tabs-4">HSDPA</a></li>
+				<li><a href="#tabs-5">HSUPA</a></li>
 			</ul>
 			<div id="tabs-1"> 
 				<table cellspacing="0" cellspacing="0" border="0" class="display" id="example1">
@@ -175,7 +207,23 @@
 					<thead> 
 						<tr>
 							<tr> 		
-						    {% for col in dc_head %}
+						    {% for col in hsdpa_head %}
+						    	<th>{{col}}</th>
+						    {% endfor %}
+							</tr>	
+						</tr> 
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+			<div id="tabs-5">
+				<table cellspacing="0" cellspacing="0" border="0" class="extra" id="example5">
+					<thead> 
+						<tr>
+							<tr> 		
+						    {% for col in hsupa_head %}
 						    	<th>{{col}}</th>
 						    {% endfor %}
 							</tr>	
