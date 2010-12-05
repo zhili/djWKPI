@@ -6,14 +6,30 @@
 	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
 	<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
 	<link rel="stylesheet" href="/polls/site_media/demo_table_jui.css" type="text/css" />
+	<link rel="stylesheet" href="/polls/site_media/datepicker/ui.daterangepicker.css" type="text/css" />
 	<style type="text/css" title="currentStyle"> 
           .ui-tabs .ui-tabs-panel { padding: 10px }
 	</style>
 
+	
 	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
     <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
 	<script src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>
 	<script src="/polls/site_media/jquery.ui.tabs.js"></script>
+	<script type="text/javascript" src="/polls/site_media/datepicker/daterangepicker.jQuery.js"></script> 
+	<script type="text/javascript">	
+		$(function(){
+			if($(window.parent.document).find('iframe').size()){
+				var inframe = true;
+			}
+			 $("#id_startDate, #id_endDate").daterangepicker({
+				dateFormat: 'mm/dd/yy',
+			 	onOpen:function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width(700).height('35em');} }, 
+			  	onClose: function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width('100%').height('5em');} }
+			 }); 
+
+		 });
+	</script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
 			var table_initialised4 = false;var table_initialised5 = false;
@@ -24,10 +40,10 @@
 								if ( oTable.length > 0 ) {
 									oTable.fnAdjustColumnSizing();
 								}
-								var oTable1 = $('div.dataTables_scrollBody>table.extra', ui.panel).dataTable();
-								if ( oTable1.length > 0 ) {
-									oTable1.fnAdjustColumnSizing();
-								}
+								// var oTable1 = $('div.dataTables_scrollBody>table.extra', ui.panel).dataTable();
+								// if ( oTable1.length > 0 ) {
+								// 	oTable1.fnAdjustColumnSizing();
+								// }
 							}
 						} );
 			$('table.display').dataTable( {
@@ -67,7 +83,18 @@
 							"bFilter": false,
 							"bProcessing": true,
 							"bServerSide": true,
-							"sAjaxSource": "/polls/extrajson/{{cell_name}}/1/"
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/1/",
+							"fnServerData": function ( sSource, aoData, fnCallback ) {
+												/* Add some extra data to the sender */
+												var startDate = document.getElementById("id_startDate").value;
+												var endDate = document.getElementById("id_endDate").value
+												aoData.push( { "name": "sdate", "value": startDate});
+												aoData.push( { "name": "edate", "value": endDate});
+												$.getJSON( sSource, aoData, function (json) { 
+													/* Do whatever additional processing you want on the callback, then tell DataTables */
+													fnCallback(json);
+												} );
+											}
 						});
 					} else {
 					    //redraw the table
@@ -93,7 +120,18 @@
 							"bFilter": false,
 							"bProcessing": true,
 							"bServerSide": true,
-							"sAjaxSource": "/polls/extrajson/{{cell_name}}/2/"
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/2/",
+							"fnServerData": function ( sSource, aoData, fnCallback ) {
+												/* Add some extra data to the sender */
+												var startDate = document.getElementById("id_startDate").value;
+												var endDate = document.getElementById("id_endDate").value
+												aoData.push( { "name": "sdate", "value": startDate});
+												aoData.push( { "name": "edate", "value": endDate});
+												$.getJSON( sSource, aoData, function (json) { 
+													/* Do whatever additional processing you want on the callback, then tell DataTables */
+													fnCallback(json);
+												} );
+											}
 						});
 					} else {
 					    //redraw the table
@@ -106,25 +144,38 @@
 	</script>
 	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
     <script type="text/javascript">
-    	// swfobject.embedSWF(
-    	//   "/polls/site_media/open-flash-chart.swf", "chart_total",
-    	//   "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
-    	//   {"data-file":"/polls/{{cell_name}}/data/"} );
-    	swfobject.embedSWF(
-    	  "/polls/site_media/open-flash-chart.swf", "chart_me",
-    	  "700", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
-    	  {"data-file":"/polls/{{cell_name}}/data/"} );
+		$(document).ready( function () {	
+ 		   	// swfobject.embedSWF(
+ 		   	// 		      	  "/polls/site_media/open-flash-chart.swf", "chart_total",
+ 		   	// 		      	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
+ 		   	// 		      	  {"data-file":"/polls/{{cell_name}}/data/"} );
+			var durl = ["/polls/{{cell_name}}/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?")
+			// console.log(durl)
+	    	swfobject.embedSWF(
+		    	  "/polls/site_media/open-flash-chart.swf", "chart_me",
+		    	  "700", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
+		    	  {"data-file":encodeURIComponent(durl)});
+  				// var endDate = new Date(document.getElementById("id_endDate").value);
+				// console.log(encodeURIComponent(document.getElementById("id_endDate").value));
+
     	// swfobject.embedSWF(
     	//   "/polls/site_media/open-flash-chart.swf", "chart_irat",
     	//   "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
     	//   {"data-file":"/polls/{{cell_name}}/2/data/"} );
-
+		});
     </script>
 {% endblock %}
 
 {% block content %}
   <h1>{{cell_name}} kpi</h1>
   <div id="main">
+		<div id = 'selecteddate'>
+			<form action="/polls/results/{{cell_name}}" method="post">
+			{% csrf_token %}
+				{{form}}
+				<input type="submit" value="Go" />  
+			</form>
+		</div>
 		<div id="tabs"> 
 			<ul> 
 				<li><a href="#tabs-1">Drop Call</a></li> 
