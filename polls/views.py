@@ -482,7 +482,7 @@ def loadExtraData(request, cellname, data_id):
         my_cell = Cell.objects.get(cell_name=cellname)
         edate_tmp = datetime.strptime(request.GET.get('edate', date.today()), "%m/%d/%Y")#date.today() + timedelta(days=1))
         sdate_tmp = datetime.strptime(request.GET.get('sdate', date.today()), "%m/%d/%Y")#edate - timedelta(days=10))
-        print sdate_tmp, edate_tmp
+        # print sdate_tmp, edate_tmp
         if edate_tmp - sdate_tmp < timedelta (days = 1):
             temp = edate_tmp
             edate_tmp = sdate_tmp
