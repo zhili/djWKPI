@@ -442,8 +442,6 @@ def loadExtraData(request, cellname, data_id):
 	    # cols = int(request.GET.get('iColumns',0)) 
         my_cell = Cell.objects.get(cell_name=cellname)
         today = date.today() + timedelta(days=1)
-        my_cell = Cell.objects.get(cell_name=cellname)
-        today = date.today() + timedelta(days=1)
         begin = today - timedelta(days=10)
         aaData = []
         if data_id == '1':
