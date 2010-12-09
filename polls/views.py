@@ -321,7 +321,22 @@ def worst_cells(request, ratetype):
 	    kpi_list = KPI.objects.filter(K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}).order_by('-date', 'rate')[:30]
 	    title = 'IRAT HO Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
-
+    elif ratetype == 'hdrab':
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b')).order_by('-date')[:4]
+	    for kp in rnc_kpi_list:
+		    l = [kp['ucell__rnc_id'], kp['date'], kp['K25_a_sum'], kp['K25_b_sum'], kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0]
+		    rnc_kpi.append(l)
+	    kpi_list = KPI.objects.filter(K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a'}).order_by('-date', 'rate')[:30]
+	    title = 'HSDPA Rab EST Success Rate'
+	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att', 'RAB EST SRate(HSDPA)']
+    elif ratetype == 'hurab':
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b')).order_by('-date')[:4]
+	    for kp in rnc_kpi_list:
+		    l = [kp['ucell__rnc_id'], kp['date'], kp['K30_a_sum'], kp['K30_b_sum'], kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0]
+		    rnc_kpi.append(l)
+	    kpi_list = KPI.objects.filter(K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}).order_by('-date', 'rate')[:30]
+	    title = 'HSUPA Rab EST Success Rate'
+	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)']
     else: # default use dcr
 	    return render_to_response('404.html')
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
