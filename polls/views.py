@@ -355,7 +355,7 @@ def tag_autocomplete(request):
         if form.is_valid():
             cn = form.cleaned_data['cellname']
  
-            return HttpResponseRedirect(reverse('polls.views.results', args=(cn.rstrip(),)))
+            return HttpResponseRedirect(reverse('polls.views.results', args=(cn.strip(),)))
     return render_to_response('search.html', RequestContext(request))
 
 
