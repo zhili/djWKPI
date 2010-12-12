@@ -12,7 +12,6 @@
 	</style>
 
 	
-	<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 
     <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
 	<script src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>
 	<script src="/polls/site_media/jquery.ui.tabs.js"></script>
@@ -23,6 +22,7 @@
 				var inframe = true;
 			}
 			 $("#id_startDate, #id_endDate").daterangepicker({
+				posY: '178px', // add this for initializing the panel position.  
 				dateFormat: 'mm/dd/yy',
 			 	onOpen:function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width(700).height('35em');} }, 
 			  	onClose: function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width('100%').height('5em');} }
@@ -32,18 +32,18 @@
 	</script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
-			var table_initialised4 = false;var table_initialised5 = false;
-			var oTable4; var oTable5;
+			var table_initialised4 = false;var table_initialised5 = false;var table_initialised6 = false;var table_initialised7 = false;
+			var oTable4; var oTable5;var oTable6;var oTable7;
 			$("#tabs").tabs( {
 							"show": function(event, ui) {
 								var oTable = $('div.dataTables_scrollBody>table.display', ui.panel).dataTable();
 								if ( oTable.length > 0 ) {
 									oTable.fnAdjustColumnSizing();
 								}
-								// var oTable1 = $('div.dataTables_scrollBody>table.extra', ui.panel).dataTable();
-								// if ( oTable1.length > 0 ) {
-								// 	oTable1.fnAdjustColumnSizing();
-								// }
+								var oTable1 = $('div.dataTables_scrollBody>table.extra', ui.panel).dataTable();
+								if ( oTable1.length > 0 ) {
+									oTable1.fnAdjustColumnSizing();
+								}
 							}
 						} );
 			$('table.display').dataTable( {
@@ -138,7 +138,80 @@
 					    // oTable4.fnDraw();
 					}
 				};
-				
+				if (ui.index == 5) {
+					if (table_initialised6 == false) {
+					    //build the table from scratch
+					    table_initialised6 = true;
+						// $.fn.dataTableExt.iApiIndex = 1;  
+				 		oTable6 = $('#example6').dataTable({
+							"sDom": '<"H"Cfr>t<"F"ip>',
+							"sScrollX": "100%",
+							"sScrollXInner": "130%",
+							"bScrollCollapse": true,
+							"bPaginate": false,
+							"bJQueryUI": true,
+							"aaSorting": [],
+							// "oLanguage": {
+							// 	"sSearch": "Custom filter:"
+							// },
+							"bFilter": false,
+							"bProcessing": true,
+							// "bServerSide": true,
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/3/",
+							"fnServerData": function ( sSource, aoData, fnCallback ) {
+												/* Add some extra data to the sender */
+												var startDate = document.getElementById("id_startDate").value;
+												var endDate = document.getElementById("id_endDate").value
+												aoData.push( { "name": "sdate", "value": startDate});
+												aoData.push( { "name": "edate", "value": endDate});
+												$.getJSON( sSource, aoData, function (json) { 
+													/* Do whatever additional processing you want on the callback, then tell DataTables */
+													fnCallback(json);
+												} );
+											}
+						});
+					} else {
+					    //redraw the table
+					    // oTable4.fnDraw();
+					}
+				};
+				if (ui.index == 6) {
+					if (table_initialised7 == false) {
+					    //build the table from scratch
+					    table_initialised7 = true;
+						// $.fn.dataTableExt.iApiIndex = 1;  
+				 		oTable7 = $('#example7').dataTable({
+							"sDom": '<"H"Cfr>t<"F"ip>',
+							"sScrollX": "100%",
+							"sScrollXInner": "130%",
+							"bScrollCollapse": true,
+							"bPaginate": false,
+							"bJQueryUI": true,
+							"aaSorting": [],
+							// "oLanguage": {
+							// 	"sSearch": "Custom filter:"
+							// },
+							"bFilter": false,
+							"bProcessing": true,
+							// "bServerSide": true,
+							"sAjaxSource": "/polls/extrajson/{{cell_name}}/4/",
+							"fnServerData": function ( sSource, aoData, fnCallback ) {
+												/* Add some extra data to the sender */
+												var startDate = document.getElementById("id_startDate").value;
+												var endDate = document.getElementById("id_endDate").value
+												aoData.push( { "name": "sdate", "value": startDate});
+												aoData.push( { "name": "edate", "value": endDate});
+												$.getJSON( sSource, aoData, function (json) { 
+													/* Do whatever additional processing you want on the callback, then tell DataTables */
+													fnCallback(json);
+												} );
+											}
+						});
+					} else {
+					    //redraw the table
+					    // oTable4.fnDraw();
+					}
+				};
 			  });
 		} );
 	</script>
@@ -149,26 +222,27 @@
  		   	// 		      	  "/polls/site_media/open-flash-chart.swf", "chart_total",
  		   	// 		      	  "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
  		   	// 		      	  {"data-file":"/polls/{{cell_name}}/data/"} );
-			var durl = ["/polls/{{cell_name}}/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?")
+			var durl = ["/polls/{{cell_name}}/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 			// console.log(durl)
 	    	swfobject.embedSWF(
 		    	  "/polls/site_media/open-flash-chart.swf", "chart_me",
-		    	  "700", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
+		    	  "600", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
 		    	  {"data-file":encodeURIComponent(durl)});
   				// var endDate = new Date(document.getElementById("id_endDate").value);
 				// console.log(encodeURIComponent(document.getElementById("id_endDate").value));
-
-    	// swfobject.embedSWF(
-    	//   "/polls/site_media/open-flash-chart.swf", "chart_irat",
-    	//   "600", "300", "9.0.0", "/polls/site_media/expressInstall.swf",
-    	//   {"data-file":"/polls/{{cell_name}}/2/data/"} );
+			
+			var durl_1 = ["/polls/{{cell_name}}/1/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
+	    	swfobject.embedSWF(
+	    	  "/polls/site_media/open-flash-chart.swf", "chart_extra",
+	    	  "600", "340", "9.0.0", "/polls/site_media/expressInstall.swf",
+	    	  {"data-file":encodeURIComponent(durl_1)});
 		});
     </script>
 {% endblock %}
 
 {% block content %}
-  <h1>{{cell_name}} kpi</h1>
-  <div id="main">
+	<h1>{{cell_name}} kpi</h1>
+  	<div id="main">
 		<div id = 'selecteddate'>
 			<form action="/polls/results/{{cell_name}}" method="post">
 			{% csrf_token %}
@@ -183,6 +257,8 @@
 				<li><a href="#tabs-3">Traffic Vol</a></li>
 				<li><a href="#tabs-4">HSDPA</a></li>
 				<li><a href="#tabs-5">HSUPA</a></li>
+				<li><a href="#tabs-6">RRC All</a></li>
+				<li><a href="#tabs-7">RAB All</a></li>
 			</ul>
 			<div id="tabs-1"> 
 				<table cellspacing="0" cellspacing="0" border="0" class="display" id="example1">
@@ -285,7 +361,41 @@
 					</tbody>
 				</table>
 			</div>
-  </div>
-  <div class="chart" id="chart_me"></div>
-  <!-- <div class="chart" id="chart_irat"></div> -->
+			<div id="tabs-6">
+				<table cellspacing="0" cellspacing="0" border="0" class="extra" id="example6">
+					<thead> 
+						<tr>
+							<tr> 		
+						    {% for col in rrc_head %}
+						    	<th>{{col}}</th>
+						    {% endfor %}
+							</tr>	
+						</tr> 
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+			<div id="tabs-7">
+				<table cellspacing="0" cellspacing="0" border="0" class="extra" id="example7">
+					<thead> 
+						<tr>
+							<tr> 		
+						    {% for col in rab_head %}
+						    	<th>{{col}}</th>
+						    {% endfor %}
+							</tr>	
+						</tr> 
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+			</div>
+  
+		</div>
+	</div>
+	<div class="chart" id="chart_me"></div>
+	<div class="chart" id="chart_extra"></div>
 {% endblock %}

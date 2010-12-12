@@ -150,37 +150,75 @@ from pyofc2  import *
 import time
 from django.core.exceptions import ObjectDoesNotExist
 def chart_by_id(request, cellname, chart_id):
-    # print chart_id
     my_cell = Cell.objects.get(cell_name=cellname)
-    today = date.today() + timedelta(days=1)
-    begin = today - timedelta(days=10)
+    edate_tmp = datetime.strptime(request.GET.get('edate', date.today()), "%m/%d/%Y")
+    sdate_tmp = datetime.strptime(request.GET.get('sdate', date.today()), "%m/%d/%Y")
+    if edate_tmp - sdate_tmp < timedelta (days = 1):
+        temp = edate_tmp
+        edate_tmp = sdate_tmp
+        sdate_tmp = temp
+    sdate = sdate_tmp.strftime("%Y-%m-%d")
+    edate = (edate_tmp + timedelta (days = 1)).strftime("%Y-%m-%d")
     t = title(text=my_cell.cell_name)
     chart = open_flash_chart()
     chart.title = t
-    cell_kpi_set = my_cell.kpi_set.filter(date__range=(begin, today))
-    if chart_id == '1':
-        b = bar()
-        y = y_axis()
-        y.min, y.max, y.steps = 0, 100, 10
-        chart.y_axis = y     
-        x = x_axis()
-        xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
-        lbls = []
-        for item in cell_kpi_set:
-	        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+    chart.bg_colour = '#FFFFFF'
+    y = y_axis()
+    y.min, y.max, y.steps = 0, 105, 10
+    y.grid_colour = '#EDF5F9'
+    y.colour = '#FF6600'
+    chart.y_axis = y     
+    x = x_axis()
+    x.grid_colour = '#EDF5F9'
+    x.colour = '#FF6600'
+    xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
+    lbls = []
     
-        xlbls.labels = lbls 
-        x.labels = xlbls
-        chart.x_axis = x
-    
-        # l.halo_size = 10
-        b.width = 4
-        # l.dot_size = 4
-        b.tip = '#key# <br> ?val#', 
-        b.text = 'Drop Call Rate'
+    cell_kpi_set = my_cell.kpi_set.filter(date__range=(sdate, edate))
 
-        b.values = [float(item.K19_a * 100.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
-        chart.add_element(b)
+    # if cell_kpi_set.count() > 0: no need to check this becausee ofc can handle empty value list and leave basic graph structure
+
+    for item in cell_kpi_set:
+        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+    xlbls.labels = lbls 
+    x.labels = xlbls
+    chart.x_axis = x
+    
+    if chart_id == '1':
+        l_K18 = line()
+        l_K18.colour = "#1DB3D9"
+        l_K18.width = 4
+         # l_K18.halo_size = 2
+         # l_K18.dot_size = 4
+        l_K18.tip = '#key#:#val#'
+        l_K18.text = 'IRAT HO'
+        l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 100.0 for item in cell_kpi_set]
+        l_K18.font_size = 14
+        
+        l_K25 = line_hollow()
+        l_K25.colour = "#FF1493"
+        l_K25.width = 4
+        l_K25.halo_size = 2
+        l_K25.dot_size = 4
+        l_K25.tip = '#key#:#val#'
+        l_K25.text = 'HSDPA RAB'
+        l_K25.values = [float(item.K25_a * 100.0 / item.K25_b) if item.K25_b > 0 else 100.0 for item in cell_kpi_set]
+        l_K25.font_size = 14
+        
+        l_K30 = line_hollow()
+        l_K30.colour = "#54FF9F"
+        l_K30.width = 4
+         # l_K18.halo_size = 2
+         # l_K18.dot_size = 4
+        l_K30.tip = '#key#:#val#'
+        l_K30.text = 'HSUPA RAB'
+        l_K30.values = [float(item.K30_a * 100.0 / item.K30_b) if item.K30_b > 0 else 100.0 for item in cell_kpi_set]
+        l_K30.font_size = 14
+        
+        chart.add_element(l_K30)
+        chart.add_element(l_K18)
+        chart.add_element(l_K25)
+
     elif chart_id == '2':
         l = line_hollow()
         y = y_axis()
@@ -228,7 +266,7 @@ def chart_data(request, cellname):
     chart.title = t
     chart.bg_colour = '#FFFFFF'
     y = y_axis()
-    y.min, y.max, y.steps = 0, 100, 10
+    # y.min, y.max, y.steps = 0, 100, 10
     y.grid_colour = '#EDF5F9'
     y.colour = '#FF6600'
     chart.y_axis = y     
@@ -248,46 +286,42 @@ def chart_data(request, cellname):
     x.labels = xlbls
     chart.x_axis = x
 
-    l_K18 = line()
-    l_K18.colour = "#3133C0"
-    l_K18.width = 4
-    # l_K18.halo_size = 2
-    # l_K18.dot_size = 4
-    l_K18.tip = '#key#  #val#'
-    l_K18.text = 'IRAT HO'
-    l_K18.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 100.0 for item in cell_kpi_set]
-    l_K18.font_size = 14
 
-    l_K19 = bar()
+
+    l_K19 = line_hollow()
     l_K19.colour = "#00FF00"
     l_K19.width = 4
-    # l.halo_size = 10
+    # l_K19.halo_size = 2
     # l_K19.dot_size = 4
-    l_K19.tip = '#key#  #val#'
+    l_K19.tip = '#key#:#val#'
     l_K19.text = 'DCR AMR'
     l_K19.values = [float(item.K19_a * 100.0 / item.K19_b) if item.K19_b > 0 else 0 for item in cell_kpi_set]
     l_K19.font_size = 14
 
-    l_K26 = bar()
+    l_K26 = line_hollow()
     l_K26.colour = "#A60289"
     l_K26.width = 4
-    # l_K26.halo_size = 2
-    # l_K18.dot_size = 4
-    l_K26.tip = '#key#  #val#'
+    l_K26.halo_size = 2
+    l_K26.dot_size = 4
+    l_K26.tip = '#key#:#val#'
     l_K26.text = 'DCR HSDPA'
     l_K26.values = [float(item.K26_a * 100.0 / item.K26_b) if item.K26_b > 0 else 0 for item in cell_kpi_set]
     l_K26.font_size = 14
 
-    l_K31 = bar()
+    l_K31 = line_hollow()
     l_K31.colour = "#FF2626"
     l_K31.width = 4
     # l_K31.halo_size = 2
-    # l_K18.dot_size = 4
-    l_K31.tip = '#key#  #val#'
+    # l_K31.dot_size = 4
+    l_K31.tip = '#key#:#val#'
     l_K31.text = 'DCR HSUPA'
     l_K31.values = [float(item.K31_a * 100.0 / item.K31_b) if item.K31_b > 0 else 0 for item in cell_kpi_set]
+    l_K31.font_size = 14
+    
+    yxis_max = max(max(l_K19.values+l_K26.values+l_K31.values), 1)
 
-    chart.add_element(l_K18)
+    y.min, y.max, y.steps = 0, round(yxis_max) + 1, round(yxis_max / 10)
+    # chart.add_element(l_K18)
     chart.add_element(l_K19)
     chart.add_element(l_K26)
     chart.add_element(l_K31)
@@ -420,7 +454,9 @@ def results(request, cellname, sdate = date.today() - timedelta(days=10), edate 
         tv_headers = ['Cell Name', 'Date', 'AMR TV', 'VP TV', 'CS TV', 'PS UL Thrg', 'PS DL Thrg', 'EUL UL Thrg', 'HSDPA DL Thrg']
         hsdpa_headers = ['Cell Name', 'Date', 'Sys Rls HS-DSCH', 'All Rls HS-DSCH', 'DCR HSDPA', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att','RAB EST SRate(HSDPA)', 'HSDPA RLC TV(Mbytes)', 'HSDPA RLC Thrg(kbps)', 'Avg HSDPA user', 'Iu-PS DL TV(MB)']
         hsupa_headers = ['Cell Name', 'Date', 'Sys Rls E-DCH', 'All Rls E-DCH', 'DCR (HSUPA)', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)', 'HSUPA RLC TV(Mbytes)', 'HSUPA RLC Thrg(kbps)', 'Avg HSUPA user', 'Iu-PS UL TV(MB)']	
-        return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv, 'hsdpa_head':hsdpa_headers, 'hsupa_head':hsupa_headers, 'form':dateform}, RequestContext(request))
+        rrc_headers = ['Cell Name', 'Date', 'RRC Conn Ss (Sv)',	'RRC Conn Att (Sv)', 'RRC Setup SRate(Sv)', 'RRC Con Ss(Oth)','RRC Conn Att(Oth)', 'RRC Setup SRate(Oth)', 'RRC Conn Ss(CS)', 'RRC Conn Att(CS)', 'RRC Con Ss(PS)', 'RRC Conn Att(PS)']
+        rab_headers = ['Cell Name', 'Date', 'CS Rab EST Ss', 'CS Rab EST Att','CS Rab EST SRate', 'PS Rab EST Ss','PS Rab EST Att', 'RAB EST SRate(PS)', 'AMR Rab EST Ss', 'AMR Rab EST Att', 'VP Rab EST Ss', 'VP Rab EST Att']
+        return render_to_response('result.html', {'cell_name':cellname, 'dc_head':dc_headers, 'cate_dc':category_dc, 'ho_head':ho_headers, 'cate_ho':category_ho,'tv_head':tv_headers, 'cate_tv': category_tv, 'hsdpa_head':hsdpa_headers, 'hsupa_head':hsupa_headers, 'rrc_head':rrc_headers, 'rab_head':rab_headers, 'form':dateform}, RequestContext(request))
     return render_to_response('404.html')
 	
 class CellNameForm(forms.Form):
@@ -509,7 +545,6 @@ def loadExtraData(request, cellname, data_id):
         if data_id == '1':
             kset = my_cell.kpi_set.filter(date__range=(sdate, edate)).order_by('date')
             if kset.count() > 0:
-                print 'kset'
                 for row in kset:
                     l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K26_a, row.K26_b, prettyfloat(row.K26_a * 100.0 / row.K26_b if row.K26_b > 0 else 0), 
                                   row.K25_a, row.K25_b, prettyfloat(row.K25_a * 100.0 / row.K25_b if row.K25_b > 0 else 100.0), 
@@ -542,6 +577,40 @@ def loadExtraData(request, cellname, data_id):
                                      sum_columns['SK30_a'], sum_columns['SK30_b'], prettyfloat(sum_columns['SK30_a'] * 100.0 / sum_columns['SK30_b'] if sum_columns['SK30_b'] > 0 else 100),
                                      prettyfloat(sum_columns['SK27']), prettyfloat(sum_columns['SK28']), prettyfloat(sum_columns['SK29']), prettyfloat(sum_columns['SK33_ucell'])]
                 aaData.append(hsupa_total)
+                iTotalRecords = iTotalDisplayRecords =  kset.count() + 1
+        elif data_id == '3':
+            kset = my_cell.kpi_set.filter(date__range=(sdate, edate)).order_by('date')
+            if kset.count() > 0:
+                for row in kset:
+                    l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K08_a, row.K08_b, prettyfloat(row.K08_a * 100.0 / row.K08_b if row.K08_b > 0 else 100), 
+                                  row.K09_a, row.K09_b, prettyfloat(row.K09_a * 100.0 / row.K09_b if row.K09_b > 0 else 100), 
+                                  row.K13_1a, row.K13_1b, row.K14_1a, row.K14_1b]
+                    aaData.append(l_dc)
+                
+                sum_columns = my_cell.kpi_set.filter(date__range=(sdate, edate)).aggregate(SK08_a=Sum('K08_a'), SK08_b=Sum('K08_b'), 
+                                                 SK09_a=Sum('K09_a'), SK09_b=Sum('K09_b'), SK13_1a=Sum('K13_1a'), SK13_1b=Sum('K13_1b'),
+                                                 SK14_1a=Sum('K14_1a'), SK14_1b=Sum('K14_1b'))
+                rrc_total = [cellname,'total', sum_columns['SK08_a'], sum_columns['SK08_b'], prettyfloat(sum_columns['SK08_a'] * 100.0 / sum_columns['SK08_b'] if sum_columns['SK08_b'] > 0 else 100),
+                                     sum_columns['SK09_a'], sum_columns['SK09_b'], prettyfloat(sum_columns['SK09_a'] * 100.0 / sum_columns['SK09_b'] if sum_columns['SK09_b'] > 0 else 100),
+                                     sum_columns['SK13_1a'], sum_columns['SK13_1b'], sum_columns['SK14_1a'], sum_columns['SK14_1b']]
+                aaData.append(rrc_total)
+                iTotalRecords = iTotalDisplayRecords =  kset.count() + 1
+        elif data_id == '4':
+            kset = my_cell.kpi_set.filter(date__range=(sdate, edate)).order_by('date')
+            if kset.count() > 0:
+                for row in kset:
+                    l_dc = [cellname, row.date.strftime('%Y-%m-%d %H:%M:%S'), row.K13_2a, row.K13_2b, prettyfloat(row.K13_2a * 100.0 / row.K13_2b if row.K13_2b > 0 else 100), 
+                                  row.K12_a, row.K12_b, prettyfloat(row.K12_a * 100.0 / row.K12_b if row.K12_b > 0 else 100), 
+                                  row.K10_a, row.K10_b, row.K11_a, row.K11_b]
+                    aaData.append(l_dc)
+                
+                sum_columns = my_cell.kpi_set.filter(date__range=(sdate, edate)).aggregate(SK13_2a=Sum('K13_2a'), SK13_2b=Sum('K13_2b'), 
+                                                 SK12_a=Sum('K12_a'), SK12_b=Sum('K12_b'), SK10_a=Sum('K10_a'), SK10_b=Sum('K10_b'),
+                                                 SK11_a=Sum('K11_a'), SK11_b=Sum('K11_b'))
+                rab_total = [cellname,'total', sum_columns['SK13_2a'], sum_columns['SK13_2b'], prettyfloat(sum_columns['SK13_2a'] * 100.0 / sum_columns['SK13_2b'] if sum_columns['SK13_2b'] > 0 else 100),
+                                     sum_columns['SK12_a'], sum_columns['SK12_b'], prettyfloat(sum_columns['SK12_a'] * 100.0 / sum_columns['SK12_b'] if sum_columns['SK12_b'] > 0 else 100),
+                                     sum_columns['SK10_a'], sum_columns['SK10_b'], sum_columns['SK11_a'], sum_columns['SK11_b']]
+                aaData.append(rab_total)
                 iTotalRecords = iTotalDisplayRecords =  kset.count() + 1
         else:
             None
