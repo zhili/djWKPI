@@ -35,9 +35,17 @@
 {% block content %}
 	<div id = 'selecteddate'>
 		{% if titleMsg == "Drop Call Rate" %}
-		<form action="{% url polls.views.changedate 'dcr' %}" method="post">
+			<form action="{% url polls.views.changedate 'dcr' %}" method="post">
 		{% else %}
-		<form action="{% url polls.views.changedate 'irat_ho' %}" method="post">
+			{% if titleMsg == "IRAT HO Success Rate" %}
+				<form action="{% url polls.views.changedate 'irat_ho' %}" method="post">
+			{% else %}
+				{% if titleMsg == "HSDPA Rab EST Success Rate" %}
+					<form action="{% url polls.views.changedate 'hdrab' %}" method="post">
+				{% else %}
+					<form action="{% url polls.views.changedate 'hurab' %}" method="post">
+				{% endif %}
+			{% endif %}
 		{% endif %}
 		{% csrf_token %}
 			{{ form }} 
@@ -69,31 +77,31 @@
 			{% endfor %}
 			</tbody>
 		</table>
-		
-<div id="main">
+	</div>	
+	<div id="main">
 
-	<h1>TopN {{titleMsg}}</h1> 
-	<table table cellspacing="1" class="display" id="example2">
-		<thead> 
-		<tr> 
-			{% for col in ColumnsHeader %}
-		    <th>{{col}}</th>
-		    {% endfor %}
-		</tr> 
-		</thead> 
-		<tbody>
-			{% for kpi in kpi_list %} 
-			 <tr>
-				<td><a href="{% url polls.views.results kpi.ucell.cell_name %}">{{ kpi.ucell.cell_name }}</a></td>
-				<td>{{ kpi.ucell.rnc_id }}</td>
-				<td>{{ kpi.date }}</td>
-				<td>{{ kpi.part }}</td> 
-				<td>{{ kpi.all }} </td>
-				<td>{{ kpi.rate}} </td>	
-			 </tr> 
-			{% endfor %}
-		</tbody>
-	</table>
-</div>
+		<h1>TopN {{titleMsg}}</h1> 
+		<table table cellspacing="1" class="display" id="example2">
+			<thead> 
+			<tr> 
+				{% for col in ColumnsHeader %}
+			    <th>{{col}}</th>
+			    {% endfor %}
+			</tr> 
+			</thead> 
+			<tbody>
+				{% for kpi in kpi_list %} 
+				 <tr>
+					<td><a href="{% url polls.views.results kpi.ucell.cell_name %}">{{ kpi.ucell.cell_name }}</a></td>
+					<td>{{ kpi.ucell.rnc_id }}</td>
+					<td>{{ kpi.date }}</td>
+					<td>{{ kpi.part }}</td> 
+					<td>{{ kpi.all }} </td>
+					<td>{{ kpi.rate}} </td>	
+				 </tr> 
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 
 {% endblock %}

@@ -98,4 +98,10 @@ body {
     text-align: left;
 }
 
+#main h1 {
+    width: 100%;
+    font-size: 16px;
+    color: #8C6239;
+    text-align: left;
+}
 
