@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block extrahead %}
+	<title>Worst Cells</title>
+	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
+	<script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" charset="utf-8"> 
+		$(document).ready( function () {
+			$('#example3').dataTable( {
+				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, 
+				// "bJQueryUI": true
+			} );
+		} );
+	</script>
+	<script src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>
+	<script type="text/javascript">
+        jQuery(function() {
+           jQuery("#id_selectedDate").datepicker({ dateFormat: 'dd/mm/yy' });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+	<div id = 'selecteddate'>
+		<form action="{% url polls.views.summary_changedate %}" method="post">
+		{% csrf_token %}
+			{{ form }} 
+			<input type="submit" value="Go" />                                
+		</form>
+	</div>
+	<div id = 'sub'>
+        <h1>{{titleMsg}}</h1> 
+		<table table23 cellspacing="1" class="display" id="example3">
+			<thead> 
+			<tr> 
+				{% for col in cheads %}
+			    <th>{{ col }}</th>
+				{% endfor %}
+			</tr> 
+			</thead>
+			<tbody>
+			{% for rnc in rnc_kpi %} 
+			<tr>
+				{% for item in rnc %}
+				<td> {{ item }}</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
