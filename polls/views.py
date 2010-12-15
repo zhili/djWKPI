@@ -642,12 +642,25 @@ def loadExtraData(request, cellname, data_id):
 def summary_kpi(request, rnc_kpi_list, dateform):
     title = 'Summary by RNC'
     rnc_kpi = []
+    rnc_total = [0, 0, 0, 0, 0, 0, 0, 0]
+    sum_cols_keys = ['K19_a_sum', 'K19_b_sum', 'K18_a_sum', 'K18_b_sum', 'K25_a_sum', 
+                'K25_b_sum', 'K30_a_sum', 'K30_b_sum']
+    idate = date.today()
     for kp in rnc_kpi_list:
         l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], prettyfloat(kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0),
             kp['K18_a_sum'], kp['K18_b_sum'], prettyfloat(kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0),
             kp['K25_a_sum'], kp['K25_b_sum'], prettyfloat(kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0),
             kp['K30_a_sum'], kp['K30_b_sum'], prettyfloat(kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0)]
         rnc_kpi.append(l)
+        i = 0
+        idate = kp['date']
+        for k in sum_cols_keys:
+            rnc_total[i] +=  kp[k]
+            i += 1
+    rnc_kpi.append(['ZSRNCS', idate, rnc_total[0], rnc_total[1], prettyfloat(rnc_total[0] * 100.0 / rnc_total[1] if rnc_total[1] > 0 else 0),
+                    rnc_total[2], rnc_total[3], prettyfloat(rnc_total[2] * 100.0 / rnc_total[3] if rnc_total[3] > 0 else 100.0),
+                    rnc_total[4], rnc_total[5], prettyfloat(rnc_total[4] * 100.0 / rnc_total[5] if rnc_total[5] > 0 else 100.0),
+                    rnc_total[6], rnc_total[7], prettyfloat(rnc_total[6] * 100.0 / rnc_total[7] if rnc_total[7] > 0 else 100.0)])
     title = 'Summary by RNC'
     column_headers = ['RNC ID', 'Date', 'Sys Rls', 'All Rls', 'DCR', 
                         'IRAT Ss', 'IRAT Rqst', 'IRAT SRate',
