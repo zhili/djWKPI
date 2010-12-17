@@ -246,6 +246,12 @@ def chart_by_id(request, cellname, chart_id):
 	    None
     return HttpResponse(chart.render())
 
+def maxinum(iterable, default=1):
+    try:
+        return max(max(iterable), default)
+    except ValueError:
+        return default
+        
 def chart_data(request, cellname):
 
     my_cell = Cell.objects.get(cell_name=cellname)
@@ -318,7 +324,7 @@ def chart_data(request, cellname):
     l_K31.values = [float(item.K31_a * 100.0 / item.K31_b) if item.K31_b > 0 else 0 for item in cell_kpi_set]
     l_K31.font_size = 14
     
-    yxis_max = max(max(l_K19.values+l_K26.values+l_K31.values), 1)
+    yxis_max = maxinum(l_K19.values+l_K26.values+l_K31.values)
 
     y.min, y.max, y.steps = 0, round(yxis_max) + 1, round(yxis_max / 10)
     # chart.add_element(l_K18)
