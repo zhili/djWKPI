@@ -385,11 +385,13 @@ def worst_cells(request, ratetype):
 from django.db.models import Q
 
 def tag_autocomplete(request):
-    if request.GET.has_key('q'):
-        q_str = request.GET['q']
+    if request.GET.has_key('name_startsWith'):
+        q_str = request.GET['name_startsWith']
         if len(q_str)>0:
-            tags = (Cell.objects.filter(Q (rnc_id__icontains=request.GET['q']) | Q (cell_name__icontains=request.GET['q'])))[:10] 
-            return HttpResponse('\n'.join(tag.cell_name for tag in tags))
+            tags = (Cell.objects.filter(Q (rnc_id__icontains=q_str) | Q (cell_name__icontains=q_str)))[:10] 
+            response_dict = {}
+            response_dict.update({'cellnames':[tag.cell_name for tag in tags]})
+            return HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
     if request.method == 'POST': 
         form = CellNameForm(request.POST) # A form bound to the POST data
         if form.is_valid():
@@ -469,7 +471,7 @@ class CellNameForm(forms.Form):
     cellname = forms.CharField(max_length=100)
 
 def about(request):
-    return render_to_response('about.html')
+    return render_to_response('about.html', RequestContext(request))
 
 
 class DateSelectForm(forms.Form):        

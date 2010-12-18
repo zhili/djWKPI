@@ -3,8 +3,10 @@
     <head> 
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
 		<meta http-equiv="Content-Language" content="pl" /> 
-        <link rel="stylesheet" href="/polls/site_media/style.css" type="text/css" media="all" /> 
-		<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script> 	
+        <link rel="stylesheet" href="/polls/site_media/style.css" type="text/css" media="all" />
+		<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
+		<script type="text/javascript" src="/polls/site_media/jquery.js"></script>
+		<script type="text/javascript" src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>	
 		<script type="text/javascript"> 
 			$(document).ready(function(){
 				$("ul.subnav").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)
@@ -26,6 +28,42 @@
 				});
 			});
 		</script>
+		
+		<script type="text/javascript" charset="utf-8"> 
+	 		$(document).ready( function () {
+				$( "#isuggest, #vsuggest" ).autocomplete({
+					source: function( request, response ) {
+						$.ajax({
+							url: "{% url polls.views.tag_autocomplete %}",
+							dataType: "json",
+							data: {
+								featureClass: "P",
+								style: "full",
+								maxRows: 12,
+								name_startsWith: request.term
+							},
+							success: function( data ) {
+								response( $.map( data.cellnames, function( item ) {
+									return {
+										label: item,
+										value: item
+									}
+								}));
+							}
+						});
+					},
+					minLength: 2,
+					open: function() {
+						$(".ui-autocomplete li.ui-menu-item:odd a").addClass("ui-menu-item-alternate");
+						$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+					},
+					close: function() {
+						$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+					}
+				});
+			});
+		</script>
+		
 		{% block extrahead %}{% endblock %}
     </head> 
     <body> 
@@ -51,9 +89,28 @@
 					        </ul>
 					    </li> 
                         <li><a href="/polls/about">About</a></li> 
-                    </ul> 
+
+					<div id="hsearch">  
+						<form action="/polls/search/" method="post">
+						{% csrf_token %}
+							<div class="ui-widget">
+								<input id="isuggest" type="search" class="search" name="cellname" placeholder="Search&hellip;"/>
+								<input type="submit" value="Search" class="button" /> 
+							</div>
+							<!-- <input type="submit" value="Search" class="btn" />	 -->
+						</form> 
+					</div>
+					</ul> 
 			</div>
-			{% block content %}{% endblock %}
+			<div id="content">
+				{% block content %}{% endblock %}
+			</div>
+			<div id="push"></div> 
+		</div>
+		<div id="footer">
+			<p> 
+			&copy; 2010 <a href="mailto:huzhili@gmail.com">huzhili@gmail.com</a>
+			</p>
 		</div>
     </body>
 </html>

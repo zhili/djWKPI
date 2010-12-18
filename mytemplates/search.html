@@ -1,70 +1,23 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+{% extends "base.html" %}
+{% block extrahead %}
 <title>WCDMA UtranCells' KPI</title>
-<link rel="stylesheet" type="text/css" href="/polls/site_media/Autocomplete/jquery.autocomplete.css"/>
-<link rel="stylesheet" href="/polls/site_media/style.css" type="text/css" media="screen" />
-<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.js"></script>
-<script type="text/javascript" src="/polls/site_media/Autocomplete/jquery.autocomplete.js"></script>
-
-<script type="text/javascript">
-$(document).ready(function() {
-
-	// function findValueCallback(event, data, formatted) {
-	// 	$("<li>").html( !data ? "No match!" : "Selected: " + formatted).appendTo("#result");
-	// }
-	// 
-	// function formatItem(row) {
-	// 	return row[0] + " <strong>decode</strong>" + row[1] ; 
-	// }
-	// function formatResult(row) {
-	// 	return row[0].replace(/(<.+?>)/gi, '');
-	// }
-	var url = ".";
-	$("#suggest").autocomplete(url, {
-		limit : 10 
-		// width: 300,
-		// multiple: false,multipleSeparator: ' ',
-		// matchContains: true,
-		// formatItem: formatItem, 
-		// formatResult: formatResult 
-	});
-	// $("#suggest").result(function(event, data, formatted) {
-	// 	var hidden = $(this).parent().next().find(">:input");
-	// 	hidden.val( (hidden.val() ? hidden.val() + ";" : hidden.val()) + data[1]);
-	// });
-});
-
-</script>
-
-</head>
-<body>
+{% endblock %}
+{% block content %}
 	<center>
 		<br><br><br>
 		<a href="/"><img src="/polls/site_media/logo.jpg" alt=""  /></a>
 		<br><br> 
 		<form action="/polls/search/" method="post">
 		{% csrf_token %}
-			<input type="text" class="ac_input" id="suggest" name="cellname" maxlength="255" size="55" style="font:18px arial,sans-serif bold;height:25px"/>
-			  <div class="ac_results" style="display: none; position: absolute; width: 150px; top: 23px; left: 93px;">
-			    <ul style="overflow: auto; max-height: 180px;">
-			       <li class="ac_even"></li>
-			       <li class="ac_odd"></li>
-			    </ul>
-			  </div>
-			<input type="submit" value="Search" class="btn" />
+			<div class="ui-widget">
+				<input id="vsuggest" name="cellname" size="55" style="font:18px arial,sans-serif bold;height:25px"/>
+				<input type="submit" value="Go" class="btn" />
+			</div>
+
 		</form>
 		<br>
 		{% block shortcuts %}
-		    {% include 'shortcuts.html' %}
-		{% endblock %}
-		{% block footer %}
-		<div class="legal">
-		 <br><br><br><br><br><br>
-		    &copy; 2010 <a href="mailto:huzhili@gmail.com">huzhili@gmail.com</a>
-		    <br>
-		</div>
+				    {% include 'shortcuts.html' %}
 		{% endblock %}
 	</center>
-</body>
-</html>
+{% endblock %}
