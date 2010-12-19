@@ -114,23 +114,29 @@ body {
     left: 560; top: 25px;
     position: relative;
     display:inline;*/
+    float:right;
     padding: 5px 5px;
     font-size: 15px;
     width: 130px;
-    overflow: hidden;
+    overflow:hidden;
+/*    position:absolute;*/
 /*    height: 20px;*/
 /*    background: url(logo_bg.gif) repeat-x;*/
 }
-#hsearch form input.search{font-size:16px;width:130px;}
-#hsearch form input.button{display:none;}
-#hsearch form input.search.notnative{width:99px;height:16px;padding:4px 10px 2px 21px;font-size:12px;border:none;background:url(search_field.gif) 0 -22px no-repeat;}
-#hsearch form input.search.notnative.placeholder{background-position:0 0;}
+.ui-widget input.search{font-size:16px;width:130px; }
+.ui-widget input.button{display:none;}
+.ui-widget input.search.notnative{width:130px;height:22px;padding:4px 10px 2px 21px;font-size:12px;border:none;background:url(search_field.gif) no-repeat scroll 0 -22px transparent;}
+/*.ui-widget input.search.notnative.placeholder{background-position:0 0;}*/
 
-#footer, #push {/* footer now sits at bottom of window*/
+#push {/* footer now sits at bottom of window*/
     height:40px;/* must match negative margin of #outer */
-    text-align: center;
 }
+#footer {
+    text-align: center;height:40px;margin:10px 0 0 0;font-size:12px;border-top:2px solid #ddd;background:#f1f1f1;
+}
+
 .ui-autocomplete-loading { background: white url(indicator.gif) right center no-repeat; }
 .ui-autocomplete a.ui-menu-item-alternate {
       background-color: #eee;  // alternate item bgcolor
     }
+    

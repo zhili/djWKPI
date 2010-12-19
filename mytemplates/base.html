@@ -5,6 +5,11 @@
 		<meta http-equiv="Content-Language" content="pl" /> 
         <link rel="stylesheet" href="/polls/site_media/style.css" type="text/css" media="all" />
 		<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
+		<!--[if !IE 7]>
+			<style type="text/css">
+				#wrap {display:table;height:100%}
+			</style>
+		<![endif]-->
 		<script type="text/javascript" src="/polls/site_media/jquery.js"></script>
 		<script type="text/javascript" src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>	
 		<script type="text/javascript"> 
@@ -63,14 +68,14 @@
 				});
 			});
 		</script>
-		
+		<script type="text/javascript" src="/polls/site_media/placeholder.js"></script>
 		{% block extrahead %}{% endblock %}
     </head> 
     <body> 
         <div id="container"> 
             <div id="header"> 
                 <!-- <div class="logo">  -->
-                    <a href="/polls/about"><img src="/polls/site_media/head.jpg" alt="" /></a> 
+                    <a href="/polls/about"><img src="/polls/site_media/head.jpg" alt="" style="border:none;" /></a> 
                     <ul class="topnav">
 						<li><a href="/polls/search/">Home</a></li>
 						<li><a href="/polls/summary/">Summary</a></li>   
@@ -94,7 +99,7 @@
 						<form action="/polls/search/" method="post">
 						{% csrf_token %}
 							<div class="ui-widget">
-								<input id="isuggest" type="search" class="search" name="cellname" placeholder="Search&hellip;"/>
+								<input id="isuggest" type="search" class="search placeholder" name="cellname" placeholder="Search&hellip;"/>
 								<input type="submit" value="Search" class="button" /> 
 							</div>
 							<!-- <input type="submit" value="Search" class="btn" />	 -->

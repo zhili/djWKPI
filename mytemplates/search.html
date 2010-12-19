@@ -5,12 +5,12 @@
 {% block content %}
 	<center>
 		<br><br><br>
-		<a href="/"><img src="/polls/site_media/logo.jpg" alt=""  /></a>
+		<a href="/"><img src="/polls/site_media/logo.jpg" alt="" style="border:none;"/></a>
 		<br><br> 
 		<form action="/polls/search/" method="post">
 		{% csrf_token %}
 			<div class="ui-widget">
-				<input id="vsuggest" name="cellname" size="55" style="font:18px arial,sans-serif bold;height:25px"/>
+				<input id="vsuggest" name="cellname" size="55" style="font:18px arial,sans-serif bold;height:26px"/>
 				<input type="submit" value="Go" class="btn" />
 			</div>
 
