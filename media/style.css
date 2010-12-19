@@ -132,11 +132,18 @@ body {
     height:40px;/* must match negative margin of #outer */
 }
 #footer {
-    text-align: center;height:40px;margin:10px 0 0 0;font-size:12px;border-top:2px solid #ddd;background:#f1f1f1;
+    text-align: center;height:40px;margin:10px 0 0 0;font-size:12px;border-top:2px solid #D5E9FB;background:#f9fcfe;color: #504E38;
 }
 
 .ui-autocomplete-loading { background: white url(indicator.gif) right center no-repeat; }
 .ui-autocomplete a.ui-menu-item-alternate {
       background-color: #eee;  // alternate item bgcolor
-    }
-    
+}
+
+#content {
+    border-top:1px solid #D5E9FB;
+}
+
+#header {
+    height:71px;
+}
