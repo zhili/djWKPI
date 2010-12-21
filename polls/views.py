@@ -359,7 +359,7 @@ def worst_cells(request, ratetype):
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a', 'failtimes':'K18_b - K18_a'}, where=['failtimes >= 2']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}, where=['K18_b - K18_a >= 2']).order_by('rate')
 	    title = 'IRAT HO Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
     elif ratetype == 'hdrab':
@@ -367,7 +367,7 @@ def worst_cells(request, ratetype):
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K25_a_sum'], kp['K25_b_sum'], kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a', 'failtimes':'K25_b - K25_a'}, where=['failtimes >= 10']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a'}, where=['K25_b - K25_a >= 10']).order_by('rate')
 	    title = 'HSDPA Rab EST Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att', 'RAB EST SRate(HSDPA)']
     elif ratetype == 'hurab':
@@ -375,7 +375,7 @@ def worst_cells(request, ratetype):
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K30_a_sum'], kp['K30_b_sum'], kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a', 'failtimes':'K30_b - K30_a'}, where=['failtimes >= 10']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}, where=['K30_b - K30_a >= 10']).order_by('rate')
 	    title = 'HSUPA Rab EST Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)']
     else: # default use dcr
@@ -525,7 +525,7 @@ def changedate(request, ratetype):
                 for kp in rnc_kpi_list:
                     l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0]
                     rnc_kpi.append(l)
-                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a', 'failtimes':'K18_b - K18_a'}, where=['failtimes >= 2']).order_by('rate')
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}, where=['K18_b - K18_a >= 2']).order_by('rate')
                 title = 'IRAT HO Success Rate'
                 column_headers = ['Cell Name', 'RNC ID', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
             elif ratetype == 'hdrab':
@@ -533,7 +533,7 @@ def changedate(request, ratetype):
                 for kp in rnc_kpi_list:
                     l = [kp['ucell__rnc_id'], kp['date'], kp['K25_a_sum'], kp['K25_b_sum'], kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0]
                     rnc_kpi.append(l)
-                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a', 'failtimes':'K25_b - K25_a'}, where=['failtimes >= 10']).order_by('rate')
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a'}, where=['K25_b - K25_a >= 10']).order_by('rate')
                 title = 'HSDPA Rab EST Success Rate'
                 column_headers = ['Cell Name', 'RNC ID', 'Date', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att', 'RAB EST SRate(HSDPA)']
             elif ratetype == 'hurab':
@@ -541,7 +541,7 @@ def changedate(request, ratetype):
                 for kp in rnc_kpi_list:
                     l = [kp['ucell__rnc_id'], kp['date'], kp['K30_a_sum'], kp['K30_b_sum'], kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0]
                     rnc_kpi.append(l)
-                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a', 'failtimes':'K30_b - K30_a'}, where=['failtimes >= 10']).order_by('rate')
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}, where=['K30_b - K30_a >= 10']).order_by('rate')
                 title = 'HSUPA Rab EST Success Rate'
                 column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)'] 
             else: # 404
