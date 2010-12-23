@@ -702,7 +702,6 @@ def summary_kpi(request, rnc_kpi_list, dateform):
     # print idates
 
     for date_key in rnc_sum_dict.keys():
-        print date_key
         irat_ft = rnc_sum_dict[date_key][3] - rnc_sum_dict[date_key][2]
         cs_rab_ft = rnc_sum_dict[date_key][5] - rnc_sum_dict[date_key][4]
         ps_rab_a = rnc_sum_dict[date_key][6] + rnc_sum_dict[date_key][8] + rnc_sum_dict[date_key][10]
