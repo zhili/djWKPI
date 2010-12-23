@@ -43,7 +43,11 @@
 				{% if titleMsg == "HSDPA Rab EST Success Rate" %}
 					<form action="{% url polls.views.changedate 'hdrab' %}" method="post">
 				{% else %}
-					<form action="{% url polls.views.changedate 'hurab' %}" method="post">
+					{% if titleMsg == "HSUPA Rab EST Success Rate" %}
+						<form action="{% url polls.views.changedate 'hurab' %}" method="post">
+					{% else %}
+						<form action="{% url polls.views.changedate 'rrc' %}" method="post">
+					{% endif %}
 				{% endif %}
 			{% endif %}
 		{% endif %}

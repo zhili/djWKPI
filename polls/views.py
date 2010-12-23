@@ -343,41 +343,50 @@ def worst_cells(request, ratetype):
     rnc_kpi = []
     kpi_list = []
     title = 'No Title'
-    latest_day = KPI.objects.order_by('-date').values('date')[0]
+    latest_datetime = KPI.objects.order_by('-date').values('date')[0]
+    latest_day = latest_datetime['date'].date()
     if ratetype == 'dcr':
 	    # kpi_list = KPI.objects.filter(date__range=(begin, today), K19_b__gt=0, K19_a__gt=0).extra(select={'rate':'K19_a*1.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-rate')[:20]
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b')).order_by('-date')[:4]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b')).order_by('-date')[:8]
 
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K19_b__gt=0, K19_a__gt=1).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-K19_a','-rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day, latest_day+timedelta(days=1)), K19_b__gt=0, K19_a__gt=1).extra(select={'rate':'K19_a*100.0 / K19_b', 'all':'K19_b', 'part':'K19_a'}).order_by('-K19_a','-rate')
 	    title ='Drop Call Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'System Release', 'All Release', 'Drop Call Rate']
     elif ratetype == 'irat_ho':
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:4]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b')).order_by('-date')[:8]
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K18_a_sum'], kp['K18_b_sum'], kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}, where=['K18_b - K18_a >= 2']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day, latest_day+timedelta(days=1)), K18_b__gt=0).extra(select={'rate':'K18_a*100.0 / K18_b','all':'K18_b', 'part':'K18_a'}, where=['K18_b - K18_a >= 2']).order_by('rate')
 	    title = 'IRAT HO Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'IRAT HO Success', 'IRAT HO Request', 'IRAT HO Success Rate']
     elif ratetype == 'hdrab':
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b')).order_by('-date')[:4]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b')).order_by('-date')[:8]
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K25_a_sum'], kp['K25_b_sum'], kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a'}, where=['K25_b - K25_a >= 50']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day, latest_day+timedelta(days=1)), K25_b__gt=0).extra(select={'rate':'K25_a*100.0 / K25_b','all':'K25_b', 'part':'K25_a'}, where=['K25_b - K25_a >= 50']).order_by('rate')
 	    title = 'HSDPA Rab EST Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'HSDPA Rab EST Ss', 'HSDPA Rab EST Att', 'RAB EST SRate(HSDPA)']
     elif ratetype == 'hurab':
-	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b')).order_by('-date')[:4]
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b')).order_by('-date')[:8]
 	    for kp in rnc_kpi_list:
 		    l = [kp['ucell__rnc_id'], kp['date'], kp['K30_a_sum'], kp['K30_b_sum'], kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0]
 		    rnc_kpi.append(l)
-	    kpi_list = KPI.objects.filter(date__range=(latest_day['date'], latest_day['date']+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}, where=['K30_b - K30_a >= 50']).order_by('rate')
+	    kpi_list = KPI.objects.filter(date__range=(latest_day, latest_day+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}, where=['K30_b - K30_a >= 50']).order_by('rate')
 	    title = 'HSUPA Rab EST Success Rate'
 	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)']
+    elif ratetype == 'rrc':
+	    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b')).order_by('-date')[:8]
+	    for kp in rnc_kpi_list:
+	        l = [kp['ucell__rnc_id'], kp['date'], kp['K08_a_sum'], kp['K08_b_sum'], kp['K08_a_sum']*100.0 / kp['K08_b_sum'] if  kp['K08_b_sum'] > 0 else 100.0]
+	        rnc_kpi.append(l)
+	    kpi_list = KPI.objects.filter(date__range=(latest_day, latest_day+timedelta(days=1)), K08_b__gt=0).extra(select={'rate':'K08_a*100.0 / K08_b','all':'K08_b', 'part':'K08_a'}, where=['K08_b - K08_a >= 3']).order_by('rate')
+	    title = 'RRC Setup Success Rate'
+	    column_headers = ['Cell Name', 'RNC ID', 'Date', 'RRC Conn SS', 'RRC Conn Att', 'RRC Setup SRate']
     else: # default use dcr
 	    return render_to_response('404.html')
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
@@ -543,7 +552,15 @@ def changedate(request, ratetype):
                     rnc_kpi.append(l)
                 kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K30_b__gt=0).extra(select={'rate':'K30_a*100.0 / K30_b','all':'K30_b', 'part':'K30_a'}, where=['K30_b - K30_a >= 50']).order_by('rate')
                 title = 'HSUPA Rab EST Success Rate'
-                column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)'] 
+                column_headers = ['Cell Name', 'RNC ID', 'Date', 'EUL Rab EST Ss', 'EUL Rab EST Att', 'RAB EST SRate (HSUPA)']
+            elif ratetype == 'rrc':
+                rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b'))
+                for kp in rnc_kpi_list:
+                    l = [kp['ucell__rnc_id'], kp['date'], kp['K08_a_sum'], kp['K08_b_sum'], kp['K08_a_sum']*100.0 / kp['K08_b_sum'] if  kp['K08_b_sum'] > 0 else 100.0]
+                    rnc_kpi.append(l)
+                kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1)), K08_b__gt=0).extra(select={'rate':'K08_a*100.0 / K08_b','all':'K08_b', 'part':'K08_a'}, where=['K08_b - K08_a >= 3']).order_by('rate')
+                title = 'RRC Setup Success Rate'
+                column_headers = ['Cell Name', 'RNC ID', 'Date', 'RRC Conn SS', 'RRC Conn Att', 'RRC Setup SRate'] 
             else: # 404
                 return render_to_response('404.html') 
     return render_to_response('worst_cells.html',  {'kpi_list':kpi_list, 'titleMsg':title, 'ColumnsHeader':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
@@ -651,30 +668,58 @@ def loadExtraData(request, cellname, data_id):
 def summary_kpi(request, rnc_kpi_list, dateform):
     title = 'Summary by RNC'
     rnc_kpi = []
-    rnc_total = [0, 0, 0, 0, 0, 0, 0, 0]
-    sum_cols_keys = ['K19_a_sum', 'K19_b_sum', 'K18_a_sum', 'K18_b_sum', 'K25_a_sum', 
-                'K25_b_sum', 'K30_a_sum', 'K30_b_sum']
-    idate = date.today()
+    sum_cols_keys = ['K19_a_sum', 'K19_b_sum', 'K18_a_sum', 'K18_b_sum', 'K13_2a_sum', 'K13_2b_sum',
+                    'K12_a_sum', 'K12_b_sum', 'K25_a_sum', 'K25_b_sum', 'K30_a_sum', 'K30_b_sum', 
+                    'K08_a_sum', 'K08_b_sum']
+    # rnc_total_list_init = 
+    rnc_sum_dict = {}
+
     for kp in rnc_kpi_list:
-        l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], kp['K19_b_sum'], prettyfloat(kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0),
-            kp['K18_a_sum'], kp['K18_b_sum'], prettyfloat(kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0),
-            kp['K25_a_sum'], kp['K25_b_sum'], prettyfloat(kp['K25_a_sum']*100.0 / kp['K25_b_sum'] if  kp['K25_b_sum'] > 0 else 100.0),
-            kp['K30_a_sum'], kp['K30_b_sum'], prettyfloat(kp['K30_a_sum']*100.0 / kp['K30_b_sum'] if  kp['K30_b_sum'] > 0 else 100.0)]
+        # irat failure
+        irat_ft = kp['K18_b_sum']-kp['K18_a_sum']
+        # cs rab failure
+        cs_rab_ft = kp['K13_2b_sum']-kp['K13_2a_sum']
+        # ps rab: ps = hsdpa + r99 + elu
+        ps_rab_a = kp['K25_a_sum'] + kp['K12_a_sum'] + kp['K30_a_sum'] 
+        ps_rab_b = kp['K25_b_sum'] + kp['K12_b_sum'] + kp['K30_b_sum']
+        ps_rab_ft = ps_rab_b - ps_rab_a
+        # rrc failure
+        rrc_ft = kp['K08_b_sum'] - kp['K08_a_sum']
+        
+        l = [kp['ucell__rnc_id'], kp['date'], kp['K19_a_sum'], prettyfloat(kp['K19_a_sum']*100.0 / kp['K19_b_sum'] if  kp['K19_b_sum'] > 0 else 0), # dcr
+            irat_ft, prettyfloat(kp['K18_a_sum']*100.0 / kp['K18_b_sum'] if  kp['K18_b_sum'] > 0 else 100.0), # irat
+            cs_rab_ft, prettyfloat(kp['K13_2a_sum']*100.0 / kp['K13_2b_sum'] if  kp['K13_2b_sum'] > 0 else 100.0), # cs rab
+            ps_rab_ft, prettyfloat(ps_rab_a *100.0 / ps_rab_b if  ps_rab_b > 0 else 100.0), # ps rab
+            rrc_ft, prettyfloat(kp['K08_a_sum']*100.0 / kp['K08_b_sum'] if  kp['K08_b_sum'] > 0 else 100.0)] # rrc service
         rnc_kpi.append(l)
+
+        if kp['date'] not in rnc_sum_dict.keys():        
+            rnc_sum_dict[kp['date']] = [0 for i in range(len(sum_cols_keys))]
         i = 0
-        idate = kp['date']
         for k in sum_cols_keys:
-            rnc_total[i] +=  kp[k]
+            rnc_sum_dict[kp['date']][i] += kp[k]
             i += 1
-    rnc_kpi.append(['ZSRNCS', idate, rnc_total[0], rnc_total[1], prettyfloat(rnc_total[0] * 100.0 / rnc_total[1] if rnc_total[1] > 0 else 0),
-                    rnc_total[2], rnc_total[3], prettyfloat(rnc_total[2] * 100.0 / rnc_total[3] if rnc_total[3] > 0 else 100.0),
-                    rnc_total[4], rnc_total[5], prettyfloat(rnc_total[4] * 100.0 / rnc_total[5] if rnc_total[5] > 0 else 100.0),
-                    rnc_total[6], rnc_total[7], prettyfloat(rnc_total[6] * 100.0 / rnc_total[7] if rnc_total[7] > 0 else 100.0)])
+    # print idates
+    print rnc_sum_dict
+    for date_key in rnc_sum_dict.keys():
+        print date_key
+        irat_ft = rnc_sum_dict[date_key][3] - rnc_sum_dict[date_key][2]
+        cs_rab_ft = rnc_sum_dict[date_key][5] - rnc_sum_dict[date_key][4]
+        ps_rab_a = rnc_sum_dict[date_key][6] + rnc_sum_dict[date_key][8] + rnc_sum_dict[date_key][10]
+        ps_rab_b = rnc_sum_dict[date_key][7] + rnc_sum_dict[date_key][9] + rnc_sum_dict[date_key][11]
+        ps_rab_ft = ps_rab_b - ps_rab_a
+        rrc_ft = rnc_sum_dict[date_key][13] - rnc_sum_dict[date_key][12]
+        rnc_kpi.append(['Network', date_key, rnc_sum_dict[date_key][0], prettyfloat(rnc_sum_dict[date_key][0] * 100.0 / rnc_sum_dict[date_key][1] if rnc_sum_dict[date_key][1] > 0 else 0), # dcr
+                        irat_ft, prettyfloat(rnc_sum_dict[date_key][2] * 100.0 / rnc_sum_dict[date_key][3] if rnc_sum_dict[date_key][3] > 0 else 100.0), # irat
+                        cs_rab_ft, prettyfloat(rnc_sum_dict[date_key][4] * 100.0 / rnc_sum_dict[date_key][5] if rnc_sum_dict[date_key][5] > 0 else 100.0), # cs rab
+                        ps_rab_ft, prettyfloat(ps_rab_a * 100.0 / ps_rab_b if ps_rab_b > 0 else 100.0), # ps rab
+                        rrc_ft, prettyfloat(rnc_sum_dict[date_key][12] * 100.0 / rnc_sum_dict[date_key][13] if rnc_sum_dict[date_key][13] > 0 else 100.0)]) # rrc
     title = 'Summary by RNC'
-    column_headers = ['RNC ID', 'Date', 'Sys Rls', 'All Rls', 'DCR', 
-                        'IRAT Ss', 'IRAT Rqst', 'IRAT SRate',
-                        'HSDPA Rab Ss', 'HSDPA Rab Att', 'RAB EST SRate(D)', 
-                        'EUL Rab Ss', 'EUL Rab Att', 'RAB EST SRate(U)']
+    column_headers = ['RNC ID', 'Date', 'DCT', 'DCR', 
+                        'IRAT FT', 'IRAT SRate',
+                        'CS Rab FT', 'CS Rab SRate', 
+                        'PS Rab FT', 'PS Rab SRate',
+                        'RRC FT', 'RRC SRate']
     return render_to_response('summary.html',  {'titleMsg':title, 'cheads':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
     
 def summary_changedate(request):
@@ -682,16 +727,23 @@ def summary_changedate(request):
         dateform = DateSelectForm(request.POST) # A form bound to the POST data
         if dateform.is_valid():
             selected_date = dateform.cleaned_data['selectedDate']
-            rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), 
-                                                                                                                                            K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'),
-                                                                                                                                            K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), 
-                                                                                                                                K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'))
+            rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
+                                                                                K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
+                                                                                K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
+                                                                                K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
+                                                                                K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
+                                                                                K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
+                                                                                K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b')) # rrc service
             return summary_kpi(request, rnc_kpi_list, dateform)
 
 def summary(request):
     dateform = DateSelectForm()
-    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), 
-                                                                        K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'),
-                                                                        K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), 
-                                                                        K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b')).order_by('-date')[:4]
+    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
+                                                                        K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
+                                                                        K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
+                                                                        K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
+                                                                        K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
+                                                                        K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
+                                                                        K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b') # rrc service
+                                                                        ).order_by('-date')[:8]
     return summary_kpi(request, rnc_kpi_list, dateform)
