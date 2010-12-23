@@ -700,7 +700,7 @@ def summary_kpi(request, rnc_kpi_list, dateform):
             rnc_sum_dict[kp['date']][i] += kp[k]
             i += 1
     # print idates
-    print rnc_sum_dict
+
     for date_key in rnc_sum_dict.keys():
         print date_key
         irat_ft = rnc_sum_dict[date_key][3] - rnc_sum_dict[date_key][2]
