@@ -6,12 +6,13 @@ ul.topnav {
 /*	background: #fff;*/
 	font-size: 15px;
 	background: url(logo_bg.gif) repeat-x;
-	width: 618px;
+	width: 462px;
+/*	margin: 0;*/
 }
 ul.topnav li {
 	float: left;
 	margin: 0;	
-	padding: 0 15px 0 0;
+	padding: 0 5px 0 0;
 	position: relative; /*--Declare X and Y axis base--*/
 	z-index:999
 }
@@ -28,10 +29,10 @@ ul.topnav li a:hover{
     cursor: pointer;
 }
 ul.topnav li span { /*--Drop down trigger styles--*/
-	width: 17px;
+/*	width: 17px;
 	height: 35px;
 	float: left;
-	background: url(subnav_btn.gif) no-repeat center top;
+	background: url(subnav_btn.gif) no-repeat center top;*/
 }
 ul.topnav li span.subhover {background-position: center bottom; cursor: pointer;} /*--Hover effect for trigger--*/
 ul.topnav li ul.subnav {
