@@ -9,7 +9,7 @@
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
 			$('#example1').dataTable( {
-				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false
+				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, "aaSorting": [[ 1, "desc" ]]
 				// "bJQueryUI": true
 			} );
 			$('#example2').dataTable( {
@@ -66,17 +66,20 @@
 				<th>{{ColumnsHeader.2}}</th>
 				<th>{{ColumnsHeader.3}}</th>
 				<th>{{ColumnsHeader.4}}</th>
-				<th>{{ColumnsHeader.5}}</th>
+				{% if ColumnsHeader.6 %}
+					<th>{{ColumnsHeader.5}}</th>
+					<th>{{ColumnsHeader.6}}</th>
+				{% else %}
+					<th>{{ColumnsHeader.5}}</th>
+				{% endif %}
 			</tr> 
 			</thead>
 			<tbody>
 			{% for k in rnc_kpi %} 
 			<tr>
-				<td> {{k.0}}</td>
-	 			<td> {{k.1}} </td>
-				<td> {{k.2}} </td>
-				<td> {{k.3}} </td>
-				<td> {{k.4}} </td>
+				{% for col in k %}
+					<td> {{col}}</td>
+				{% endfor%}
 			</tr>
 			{% endfor %}
 			</tbody>
@@ -88,9 +91,16 @@
 		<table table cellspacing="1" class="display" id="example2">
 			<thead> 
 			<tr> 
-				{% for col in ColumnsHeader %}
-			    <th>{{col}}</th>
-			    {% endfor %}
+			    <th>{{ColumnsHeader.0}}</th>
+				<th>{{ColumnsHeader.1}}</th>
+				<th>{{ColumnsHeader.2}}</th>
+				<th>{{ColumnsHeader.3}}</th>
+				<th>{{ColumnsHeader.4}}</th>
+				{% if ColumnsHeader.6 %}
+					<th>{{ColumnsHeader.6}}</th>
+				{% else %}
+					<th>{{ColumnsHeader.5}}</th>
+				{% endif %}
 			</tr> 
 			</thead> 
 			<tbody>

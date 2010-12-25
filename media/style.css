@@ -6,7 +6,7 @@ ul.topnav {
 /*	background: #fff;*/
 	font-size: 15px;
 	background: url(logo_bg.gif) repeat-x;
-	width: 530px;
+	width: 618px;
 }
 ul.topnav li {
 	float: left;
@@ -42,7 +42,7 @@ ul.topnav li ul.subnav {
 	margin: 0; padding: 0;
 	display: none;
 	float: left;
-	width: 140px;
+	width: 115px;
 	-moz-border-radius-bottomleft: 5px;
 	-moz-border-radius-bottomright: 5px;
 	-webkit-border-bottom-left-radius: 5px;
@@ -54,11 +54,11 @@ ul.topnav li ul.subnav li{
 	border-top: 1px solid #EDF4FD; /*--Create bevel effect--*/
 	border-bottom: 1px solid #EDF4FD; /*--Create bevel effect--*/
 	clear: both;
-	width: 140px;
+	width: 115px;
 }
 html ul.topnav li ul.subnav li a {
 	float: left;
-	width: 115px;
+	width: 90px;
 	background: #F9FCFE url(dropdown_linkbg.gif) no-repeat 10px center;
 	padding-left: 20px;
 }
