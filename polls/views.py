@@ -688,7 +688,7 @@ def summary_kpi(request, rnc_kpi_list, dateform):
         ps_rab_b = rnc_sum_dict[date_key][7] + rnc_sum_dict[date_key][9] + rnc_sum_dict[date_key][11]
         ps_rab_ft = ps_rab_b - ps_rab_a
         rrc_ft = rnc_sum_dict[date_key][13] - rnc_sum_dict[date_key][12]
-        rnc_kpi.append(['Network', date_key, rnc_sum_dict[date_key][0], prettyfloat(rnc_sum_dict[date_key][0] * 100.0 / rnc_sum_dict[date_key][1] if rnc_sum_dict[date_key][1] > 0 else 0), # dcr
+        rnc_kpi.append(['ZSWNet', date_key, rnc_sum_dict[date_key][0], prettyfloat(rnc_sum_dict[date_key][0] * 100.0 / rnc_sum_dict[date_key][1] if rnc_sum_dict[date_key][1] > 0 else 0), # dcr
                         irat_ft, prettyfloat(rnc_sum_dict[date_key][2] * 100.0 / rnc_sum_dict[date_key][3] if rnc_sum_dict[date_key][3] > 0 else 100.0), # irat
                         cs_rab_ft, prettyfloat(rnc_sum_dict[date_key][4] * 100.0 / rnc_sum_dict[date_key][5] if rnc_sum_dict[date_key][5] > 0 else 100.0), # cs rab
                         ps_rab_ft, prettyfloat(ps_rab_a * 100.0 / ps_rab_b if ps_rab_b > 0 else 100.0), # ps rab
