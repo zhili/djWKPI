@@ -159,7 +159,7 @@ def chart_by_id(request, cellname, chart_id):
     # if cell_kpi_set.count() > 0: no need to check this becausee ofc can handle empty value list and leave basic graph structure
 
     for item in cell_kpi_set:
-        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+        lbls.append(item.date.strftime('%y-%m-%d %H'))
     xlbls.labels = lbls 
     x.labels = xlbls
     chart.x_axis = x
@@ -200,28 +200,51 @@ def chart_by_id(request, cellname, chart_id):
         chart.add_element(l_K25)
 
     elif chart_id == '2':
-        l = line_hollow()
-        y = y_axis()
-        y.min, y.max, y.steps = 0, 100, 10
-        chart.y_axis = y     
-        x = x_axis()
-        xlbls = x_axis_labels(steps=1, rotate='45', colour='#FF0000', size=16)
-        lbls = []
+        t = title(text="RRC Connection")
+        chart.title = t
+        p = pie()
+        # p.start_angle = '135' 
+        p.colours = ['#FF0000','#00FF00']
+        rrc_ss = sum([item.K08_a for item in cell_kpi_set])
+        rrc_att = sum([item.K08_b for item in cell_kpi_set])
+        if rrc_ss == 0 and rrc_att == 0:
+            rrc_list = [pie_value(label='Warning:No RRC Connection', value=1)]
+        else:
+            rrc_list = [pie_value(label='RRC SS', value=rrc_ss), pie_value(label='RRC ATT', value=rrc_att)]
+        p.values = rrc_list
+        chart.add_element(p)
 
-        for item in cell_kpi_set:
-	        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
     
-        xlbls.labels = lbls 
-        x.labels = xlbls
-        chart.x_axis = x
-        l.colour = "#3133C0"
-        l.width = 4
-        # l.halo_size = 10
-        l.dot_size = 4
-        l.tip = '#key#  #val#'
-        l.text = 'IRAT HO'
-        l.values = [float(item.K18_a * 100.0 / item.K18_b) if item.K18_b > 0 else 0 for item in cell_kpi_set]
-        chart.add_element(l)
+    elif chart_id == '3':
+        t = title(text="CS Traffic")
+        chart.title = t
+        p = pie()
+        # p.start_angle = 135 
+        p.colours = ['#d01f3c','#356aa0', '#C79810']
+        cs_tv_list = []
+        for item in cell_kpi_set:
+            if item.K03 != 0:
+                cs_tv_list.append(pie_value(label=item.date.strftime('%m-%d %H'), value=item.K03))
+        if len(cs_tv_list) == 0:
+            cs_tv_list.append(pie_value(label='Warning No CS Call', value=1))
+        p.values = cs_tv_list
+        chart.add_element(p)
+    elif chart_id == '4':
+        t = title(text="RAB EST")
+        chart.title = t
+        p = pie()
+        p.colours = ['#007777','#A0C0D9']
+        rab_att = 0
+        rab_ss = 0
+        for item in cell_kpi_set:
+            rab_ss += item.K13_2a + item.K12_a + item.K25_a + item.K30_a
+            rab_att += item.K13_2b + item.K12_b + item.K25_b + item.K30_b
+        if rab_att == 0 and rab_ss == 0:
+            rab_list = [pie_value(label='Warning:No RAB EST', value=1)]
+        else:
+            rab_list = [pie_value(label='RAB SS', value=rab_ss), pie_value(label='RAB ATT', value=rab_att)]
+        p.values = rab_list
+        chart.add_element(p)
     else:
 	    None
     return HttpResponse(chart.render())
@@ -267,7 +290,7 @@ def chart_data(request, cellname):
     # if cell_kpi_set.count() > 0: no need to check this becausee ofc can handle empty value list and leave basic graph structure
 
     for item in cell_kpi_set:
-        lbls.append(item.date.strftime('%Y-%m-%d %H:%M:%S'))
+        lbls.append(item.date.strftime('%y-%m-%d %H'))
     xlbls.labels = lbls 
     x.labels = xlbls
     chart.x_axis = x
