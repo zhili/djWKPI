@@ -83,7 +83,7 @@ body {
 }
 
 #container {
-/*  width: 960px;*/
+  width: 960px;
 	margin: 0 auto -40px;
 	position: relative;
 	min-height:100%;
@@ -157,4 +157,41 @@ html > body #container {
 #header .logo {
     position:absolute;
     left:20px;
+}
+
+table.extra, table.display {border-width: 1px;border-spacing:0px ;border-style: solid;border-color: #cfcfcf;border-collapse: collapse;background-color: transparent;}
+table.extra th, table.display th {border-width: 1px;padding: 1px;border-style: solid;border-color: #cfcfcf;white-space: normal; background-color: #afafaf;text-align:left;}
+table.extra td, table.display td {border-width: 1px;padding: 1px;border-style: solid;border-color: #cfcfcf;text-align: left;vertical-align:middle;white-space:nowrap;}
+
+
+table.extra tr.even:hover, table.display tr.even:hover {
+	background-color: #ECFFB3;
+}
+
+table.extra tr.even:hover td, table.display tr.even:hover td {
+	background-color: #DDFF75;
+}
+
+table.extra tr.even:hover td, table.display tr.even:hover td {
+	background-color: #E7FF9E;
+}
+
+table.extra tr.even:hover td, table.display tr.even:hover td {
+	background-color: #E2FF89;
+}
+
+table.extra tr.odd:hover, table.display tr.odd:hover {
+	background-color: #E6FF99;
+}
+
+table.extra tr.odd:hover td, table.display tr.odd:hover td {
+	background-color: #D6FF5C;
+}
+
+table.extra tr.odd:hover td, table.display tr.odd:hover td {
+	background-color: #E0FF84;
+}
+
+table.extra tr.odd:hover td, table.display tr.odd:hover td {
+	background-color: #DBFF70;
 }
