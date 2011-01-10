@@ -1,11 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% block extrastyle %}
-<link href="/polls/site_media/swfupload/swfupload.css" rel="stylesheet" type="text/css" />
-<script src="/polls/site_media/swfupload/swfupload.js" type="text/javascript"></script>
-<script src="/polls/site_media/swfupload/swfupload.cookies.js" type="text/javascript"></script>
-<script src="/polls/site_media/swfupload/handlers.js" type="text/javascript"></script>
-<script type="text/javascript" src="/polls/site_media/swfupload/fileprogress.js"></script>
-<script type="text/javascript" src="/polls/site_media/swfupload/swfupload.queue.js"></script>
+<link href="/media/swfupload/swfupload.css" rel="stylesheet" type="text/css" />
+<script src="/media/swfupload/swfupload.js" type="text/javascript"></script>
+<script src="/media/swfupload/swfupload.cookies.js" type="text/javascript"></script>
+<script src="/media/swfupload/handlers.js" type="text/javascript"></script>
+<script type="text/javascript" src="/media/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="/media/swfupload/swfupload.queue.js"></script>
 
 
 <script language="javascript" type="text/javascript">
@@ -15,7 +15,7 @@
 	swfupload = new SWFUpload({
 		debug: false,
 		upload_url: "{% url polls.views.upload %}",
-		flash_url: "/polls/site_media/swfupload/swfupload.swf",
+		flash_url: "/media/swfupload/swfupload.swf",
 		file_size_limit : "100 MB",
 		file_types : "*.csv",
 		file_types_description : "CSV",

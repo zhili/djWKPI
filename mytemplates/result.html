@@ -3,14 +3,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Ucell KPI App</title>
 	<meta name="author" content="zhili hu">
-	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="/polls/site_media/demo_table_jui.css" type="text/css" />
-	<link rel="stylesheet" href="/polls/site_media/datepicker/ui.daterangepicker.css" type="text/css" />
+	<link rel="stylesheet" href="/media/datatable.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="/media/demo_table_jui.css" type="text/css" />
+	<link rel="stylesheet" href="/media/datepicker/ui.daterangepicker.css" type="text/css" />
 	<style type="text/css" title="currentStyle"> 
           .ui-tabs .ui-tabs-panel { padding: 10px }
 	</style>
-    <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" src="/polls/site_media/datepicker/daterangepicker.jQuery.js"></script> 
+    <script type="text/javascript" src="/media/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="/media/datepicker/daterangepicker.jQuery.js"></script> 
 	<script type="text/javascript">	
 		$(function(){
 			if($(window.parent.document).find('iframe').size()){
@@ -209,7 +209,7 @@
 			  });
 		} );
 	</script>
-	<script type="text/javascript" src="/polls/site_media/swfobject.js"></script>
+	<script type="text/javascript" src="/media/swfobject.js"></script>
     <script type="text/javascript">
 		$(document).ready( function () {	
  		   	// swfobject.embedSWF(
@@ -219,34 +219,34 @@
 			var durl = ["/polls/{{cell_name}}/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 			// console.log(durl)
 	    	swfobject.embedSWF(
-		    	  "/polls/site_media/open-flash-chart.swf", "chart_me",
-		    	  "600", "330", "9.0.0", "/polls/site_media/expressInstall.swf",
+		    	  "/media/open-flash-chart.swf", "chart_me",
+		    	  "600", "330", "9.0.0", "/media/expressInstall.swf",
 		    	  {"data-file":encodeURIComponent(durl)});
   				// var endDate = new Date(document.getElementById("id_endDate").value);
 				// console.log(encodeURIComponent(document.getElementById("id_endDate").value));
 			
 			var durl_1 = ["/polls/{{cell_name}}/1/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 	    	swfobject.embedSWF(
-	    	  "/polls/site_media/open-flash-chart.swf", "chart_extra",
-	    	  "600", "330", "9.0.0", "/polls/site_media/expressInstall.swf",
+	    	  "/media/open-flash-chart.swf", "chart_extra",
+	    	  "600", "330", "9.0.0", "/media/expressInstall.swf",
 	    	  {"data-file":encodeURIComponent(durl_1)});
 	
 			var durl_2 = ["/polls/{{cell_name}}/2/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 	    	swfobject.embedSWF(
-	    	  "/polls/site_media/open-flash-chart.swf", "chart_be",
-	    	  "360", "220", "9.0.0", "/polls/site_media/expressInstall.swf",
+	    	  "/media/open-flash-chart.swf", "chart_be",
+	    	  "360", "220", "9.0.0", "/media/expressInstall.swf",
 	    	  {"data-file":encodeURIComponent(durl_2)});
 	
 			var durl_3 = ["/polls/{{cell_name}}/3/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 	    	swfobject.embedSWF(
-	    	  "/polls/site_media/open-flash-chart.swf", "chart_tv",
-	    	  "360", "220", "9.0.0", "/polls/site_media/expressInstall.swf",
+	    	  "/media/open-flash-chart.swf", "chart_tv",
+	    	  "360", "220", "9.0.0", "/media/expressInstall.swf",
 	    	  {"data-file":encodeURIComponent(durl_3)});
 	
 			var durl_4 = ["/polls/{{cell_name}}/4/data/", [["sdate", document.getElementById("id_startDate").value].join('='), ["edate", document.getElementById("id_endDate").value].join('=')].join("&")].join("?");
 	    	swfobject.embedSWF(
-	    	  "/polls/site_media/open-flash-chart.swf", "chart_rab",
-	    	  "360", "220", "9.0.0", "/polls/site_media/expressInstall.swf",
+	    	  "/media/open-flash-chart.swf", "chart_rab",
+	    	  "360", "220", "9.0.0", "/media/expressInstall.swf",
 	    	  {"data-file":encodeURIComponent(durl_4)});
 		});
     </script>

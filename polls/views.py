@@ -417,7 +417,7 @@ def tag_autocomplete(request):
 def prettyfloat(number):
     return "%0.2f" % number  # Works the same.
 
-def results(request, cellname, sdate = date.today() - timedelta(days=10), edate = date.today() + timedelta(days=1)):
+def results(request, cellname, sdate = date.today() - timedelta(days=5), edate = date.today() + timedelta(days=1)):
     # print my_cell
     # print KPI.objects.values('ucell__rnc_id').annotate(Sum('K01'), Sum('K02')).order_by('date')[:1]
     dateform = DateRangeSelectForm()
@@ -499,7 +499,7 @@ class DateSelectForm(forms.Form):
 
 class DateRangeSelectForm(forms.Form):        
 
-    startDate = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=10),
+    startDate = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=5),
         widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
             'class':'input',
             'readonly':'readonly',

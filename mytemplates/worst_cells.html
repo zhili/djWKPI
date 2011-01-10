@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block extrahead %}
 	<title>Worst Cells</title>
-	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="/polls/site_media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
+	<link rel="stylesheet" href="/media/datatable.css" type="text/css" media="print, projection, screen" />
+	<link rel="stylesheet" href="/media/redmond/jquery-ui-1.8.6.custom.css" type="text/css"/>
 	<!-- <link rel="stylesheet" href="/polls/site_media/demo_table_jui.css" type="text/css" /> -->
 
-	<script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="/media/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
 			$('#example1').dataTable( {
@@ -21,10 +21,10 @@
 				"sSearch": "Custom filter:"
 				}
 
-			} );
+			} )
 		} );
 	</script>
-	<script src="/polls/site_media/jquery-ui-1.8.6.custom.min.js"></script>
+	<script src="/media/jquery-ui-1.8.6.custom.min.js"></script>
 	<script type="text/javascript">
         jQuery(function() {
            jQuery("#id_selectedDate").datepicker({ dateFormat: 'dd/mm/yy' });
