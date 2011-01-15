@@ -749,3 +749,40 @@ def summary(request):
                                                                         K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b') # rrc service
                                                                         ).order_by('-date')[:8]
     return summary_kpi(request, rnc_kpi_list, dateform)
+
+
+
+def junglecell(request, sdate = date.today() - timedelta(days=10), edate = date.today() + timedelta(days=1)):
+    dateform = DateRangeSelectForm()
+    if request.method == 'POST':
+        dateform = DateRangeSelectForm(request.POST) # A form bound to the POST data
+        if dateform.is_valid():
+           sdate = dateform.cleaned_data['startDate']
+           edate = dateform.cleaned_data['endDate']
+           if edate - sdate < timedelta (days = 1):
+               temp = edate
+               edate = sdate
+               sdate = temp
+           edate += timedelta(days=1)
+
+    access_fault_list = KPI.objects.filter(date__range=(sdate, edate), K03__gt=0.1).extra(select={'cssr':'K08_a * 1.0 / K08_b * (K13_2a + K12_a) / (K13_2b+K12_b)', 'rab_att':'K13_2b+K12_b'}, where=['K13_2b+K12_b > 20', 'K08_a * 1.0 / K08_b * (K13_2a + K12_a) * 1.0 / (K13_2b+K12_b) < 0.95'])
+    problem_cells = []
+    frequencies = {}
+    for item in access_fault_list:
+        if item.date.hour == 20: # target on the 20:00 kpi
+            frequencies[item.ucell.cell_name] = (frequencies[item.ucell.cell_name] if frequencies.has_key(item.ucell.cell_name) else 0) + 1
+    for cellname in frequencies.keys():
+        if frequencies[cellname] > 2:
+            problem_cells.append([cellname, 'accessibility', frequencies[cellname]])
+    frequencies.clear()
+    
+    droppedcall_list = KPI.objects.filter(date__range=(sdate, edate), K03__gt=0.1).extra(select={'dcr':'(K19_a + K20_a) * 1.0 / (K19_b + K20_b)'}, where=['K19_a + K20_a > 2', '(K19_a + K20_a) * 1.0 / (K19_b + K20_b) > 0.03'])
+    for item in droppedcall_list:
+        if item.date.hour == 20: # target on the 20:00 kpi
+            frequencies[item.ucell.cell_name] = (frequencies[item.ucell.cell_name] if frequencies.has_key(item.ucell.cell_name) else 0) + 1
+    for cellname in frequencies.keys():
+        if frequencies[cellname] > 2:
+            problem_cells.append([cellname, 'dropped call', frequencies[cellname]])
+
+    column_headers = ['cell name', 'Cause', 'fault times']
+    return render_to_response('junglecell.html', {'form':dateform, 'cheads':column_headers, 'jcells':problem_cells}, RequestContext(request))

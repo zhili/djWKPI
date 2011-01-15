@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Problem Cells v4.0</title>
+	<meta name="author" content="zhili hu">
+	<link rel="stylesheet" href="/polls/site_media/datepicker/ui.daterangepicker.css" type="text/css" />
+	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
+    <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="/polls/site_media/datepicker/daterangepicker.jQuery.js"></script> 
+	<script type="text/javascript">	
+		$(function(){
+			if($(window.parent.document).find('iframe').size()){
+				var inframe = true;
+			}
+			 $("#id_startDate, #id_endDate").daterangepicker({
+				dateFormat: 'mm/dd/yy',
+			 	onOpen:function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width(700).height('35em');} }, 
+			  	onClose: function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width('100%').height('5em');} }
+			 }); 
+
+		 });
+	</script>
+	<script type="text/javascript" charset="utf-8"> 
+		$(document).ready( function () {
+			$('#example3').dataTable( {
+				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, "aaSorting": [[ 1, "desc" ], [ 0, "asc" ]]
+				// "bJQueryUI": true
+			} );
+		} );
+	</script>
+{% endblock %}
+
+{% block content %}
+
+<div id="main">
+	<div id = 'selecteddate'>
+		<form action="/polls/junglecell/" method="post">
+		{% csrf_token %}
+			{{form}}
+			<input type="submit" value="Go" />  
+		</form>
+	</div>
+	<div  id = 'sub'>
+		<h1>{{titleMsg}}</h1> 
+		<table table23 cellspacing="1" class="display" id="example3">
+			<thead> 
+			<tr> 
+				{% for col in cheads %}
+			    <th>{{ col }}</th>
+				{% endfor %}
+			</tr> 
+			</thead>
+			<tbody>
+			{% for cell in jcells %} 
+			<tr>
+				{% for item in cell %}
+				<td> {{ item }}</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
