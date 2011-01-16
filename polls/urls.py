@@ -29,7 +29,6 @@ urlpatterns = patterns('',
     (r'^worst-cells/date/(?P<ratetype>\w+)/$', 'polls.views.changedate'),
     (r'^extrajson/(?P<cellname>\w+)/(?P<data_id>\d+)/$', 'polls.views.loadExtraData'),
     (r'^summary/$', 'polls.views.summary'),
-    (r'^summary/date/$', 'polls.views.summary_changedate'),
     (r'^junglecell/$', 'polls.views.junglecell')
 )
 

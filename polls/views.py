@@ -497,23 +497,34 @@ class DateSelectForm(forms.Form):
         })
     )
 
-class DateRangeSelectForm(forms.Form):        
+class DateRangeSelectForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(DateRangeSelectForm, self).__init__(*args, **kwargs)
+        self.fields['startDate'] = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=10),
+                widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                    'class':'input',
+                    'readonly':'readonly',
+                    'size':'15'
+                })
+            )
 
-    startDate = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=10),
-        widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
-            'class':'input',
-            'readonly':'readonly',
-            'size':'15'
-        })
-    )
-    endDate = forms.DateField(('%m/%d/%Y',), label='To', required=False, initial=date.today(),
-        widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
-            'class':'input',
-            'readonly':'readonly',
-            'size':'15'
-        })
-    )
-  
+        self.fields['endDate'] = forms.DateField(('%m/%d/%Y',), label='To', required=False, initial=date.today(),
+                widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                    'class':'input',
+                    'readonly':'readonly',
+                    'size':'15'
+                })
+            )
+    def setInitRange(self, days_):
+        if days_:
+            self.fields['startDate'] =  forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=days_),
+                    widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                        'class':'input',
+                        'readonly':'readonly',
+                        'size':'15'
+                    })
+                )
+                
 def changedate(request, ratetype):
     kpi_list = []
     title = 'Not Found'
@@ -724,30 +735,29 @@ def summary_kpi(request, rnc_kpi_list, dateform):
                         'RRC FT', 'RRC SRate']
     return render_to_response('summary.html',  {'titleMsg':title, 'cheads':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
     
-def summary_changedate(request):
-    if request.method == 'POST':
-        dateform = DateSelectForm(request.POST) # A form bound to the POST data
-        if dateform.is_valid():
-            selected_date = dateform.cleaned_data['selectedDate']
-            rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
-                                                                                K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
-                                                                                K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
-                                                                                K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
-                                                                                K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
-                                                                                K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
-                                                                                K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b')) # rrc service
-            return summary_kpi(request, rnc_kpi_list, dateform)
 
-def summary(request):
-    dateform = DateSelectForm()
-    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
+def summary(request, sdate = date.today() - timedelta(days=1), edate = date.today() + timedelta(days=1)):
+    dateform = DateRangeSelectForm()
+    dateform.setInitRange(1)
+    if request.method == 'POST':
+        dateform = DateRangeSelectForm(request.POST) # A form bound to the POST data
+        if dateform.is_valid():
+           sdate = dateform.cleaned_data['startDate']
+           edate = dateform.cleaned_data['endDate']
+           if edate - sdate < timedelta (days = 1):
+               temp = edate
+               edate = sdate
+               sdate = temp
+           edate += timedelta(days=1)
+    
+    rnc_kpi_list = KPI.objects.filter(date__range=(sdate, edate)).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
                                                                         K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
                                                                         K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
                                                                         K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
                                                                         K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
                                                                         K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
                                                                         K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b') # rrc service
-                                                                        ).order_by('-date')[:8]
+                                                                        ).order_by('-date')
     return summary_kpi(request, rnc_kpi_list, dateform)
 
 

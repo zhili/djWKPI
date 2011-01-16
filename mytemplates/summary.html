@@ -2,7 +2,7 @@
 {% block extrahead %}
 	<title>Worst Cells</title>
 	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
-	
+	<link rel="stylesheet" href="/polls/site_media/datepicker/ui.daterangepicker.css" type="text/css" />
 	<script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" charset="utf-8"> 
 		$(document).ready( function () {
@@ -12,20 +12,29 @@
 			} );
 		} );
 	</script>
-	<script type="text/javascript">
-        jQuery(function() {
-           jQuery("#id_selectedDate").datepicker({ dateFormat: 'dd/mm/yy' });
-        });
-    </script>
+	<script type="text/javascript" src="/polls/site_media/datepicker/daterangepicker.jQuery.js"></script> 
+	<script type="text/javascript">	
+		$(function(){
+			if($(window.parent.document).find('iframe').size()){
+				var inframe = true;
+			}
+			 $("#id_startDate, #id_endDate").daterangepicker({
+				dateFormat: 'mm/dd/yy',
+			 	onOpen:function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width(700).height('35em');} }, 
+			  	onClose: function(){ if(inframe){ $(window.parent.document).find('iframe:eq(0)').width('100%').height('5em');} }
+			 }); 
+
+		 });
+	</script>
 
 {% endblock %}
 
 {% block content %}
 	<div id = 'selecteddate'>
-		<form action="{% url polls.views.summary_changedate %}" method="post">
+		<form action="/polls/summary/" method="post">
 		{% csrf_token %}
-			{{ form }} 
-			<input type="submit" value="Go" />                                
+			{{form}}
+			<input type="submit" value="Go" />  
 		</form>
 	</div>
 	<div id = 'sub'>
