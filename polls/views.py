@@ -770,28 +770,37 @@ def junglecell(request, sdate = date.today() - timedelta(days=10), edate = date.
     frequencies = {}
     for item in access_fault_list:
         if item.date.hour == 20: # target on the 20:00 kpi
-            frequencies[item.ucell.cell_name] = (frequencies[item.ucell.cell_name] if frequencies.has_key(item.ucell.cell_name) else 0) + 1
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
     for cellname in frequencies.keys():
-        if frequencies[cellname] > 2:
-            problem_cells.append([cellname, 'accessibility', frequencies[cellname]])
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'accessibility', len(frequencies[cellname]), frequencies[cellname]])
     frequencies.clear()
     
     droppedcall_list = KPI.objects.filter(date__range=(sdate, edate), K03__gte=0.1).extra(select={'dcr':'(K19_a + K20_a) * 1.0 / (K19_b + K20_b)'}, where=['K19_a + K20_a > 2', '(K19_a + K20_a) * 1.0 / (K19_b + K20_b) > 0.03'])
     for item in droppedcall_list:
         if item.date.hour == 20: # target on the 20:00 kpi
-            frequencies[item.ucell.cell_name] = (frequencies[item.ucell.cell_name] if frequencies.has_key(item.ucell.cell_name) else 0) + 1
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
     for cellname in frequencies.keys():
-        if frequencies[cellname] > 2:
-            problem_cells.append([cellname, 'dropped call', frequencies[cellname]])
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'dropped call', len(frequencies[cellname]), frequencies[cellname]])
     frequencies.clear()
         
     irat_ho_list = KPI.objects.filter(date__range=(sdate, edate), K18_b__gt=20).extra(select={'dcr':'K18_a * 1.0 / K18_b'}, where=['K18_a * 1.0 / K18_b <= 0.9'])
     for item in irat_ho_list:
         if item.date.hour == 20: # target on the 20:00 kpi
-            frequencies[item.ucell.cell_name] = (frequencies[item.ucell.cell_name] if frequencies.has_key(item.ucell.cell_name) else 0) + 1
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
     for cellname in frequencies.keys():
-        if frequencies[cellname] > 2:
-            problem_cells.append([cellname, 'Irat Ho Failure', frequencies[cellname]])
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'Irat Ho Failure', len(frequencies[cellname]), frequencies[cellname]])
     
-    column_headers = ['cell name', 'Cause', 'fault times']
+    column_headers = ['Cell Name', 'Cause', 'Fault Times', 'Date of Occurrence ']
     return render_to_response('junglecell.html', {'form':dateform, 'cheads':column_headers, 'jcells':problem_cells}, RequestContext(request))
