@@ -1,17 +1,12 @@
 {% extends "base.html" %}
+
 {% block extrahead %}
-	<title>Worst Cells</title>
-	<link rel="stylesheet" href="/media/datatable.css" type="text/css" media="print, projection, screen" />
-	<link rel="stylesheet" href="/media/datepicker/ui.daterangepicker.css" type="text/css" />
-	<script type="text/javascript" src="/media/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" charset="utf-8"> 
-		$(document).ready( function () {
-			$('#example3').dataTable( {
-				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, "aaSorting": [[ 1, "desc" ], [ 0, "asc" ]]
-				// "bJQueryUI": true
-			} );
-		} );
-	</script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Problem Cells v4.0</title>
+	<meta name="author" content="zhili hu">
+	<link rel="stylesheet" href="/polls/site_media/datepicker/ui.daterangepicker.css" type="text/css" />
+	<link rel="stylesheet" href="/polls/site_media/datatable.css" type="text/css" media="print, projection, screen" />
+    <script type="text/javascript" src="/polls/site_media/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="/polls/site_media/datepicker/daterangepicker.jQuery.js"></script> 
 	<script type="text/javascript">	
 		$(function(){
@@ -26,19 +21,28 @@
 
 		 });
 	</script>
-
+	<script type="text/javascript" charset="utf-8"> 
+		$(document).ready( function () {
+			$('#example3').dataTable( {
+				"sDom": 'C<"clear">lfrtip', "bFilter": false,"bInfo": false, "bPaginate": false, "aaSorting": [[ 1, "desc" ], [ 0, "asc" ]]
+				// "bJQueryUI": true
+			} );
+		} );
+	</script>
 {% endblock %}
 
 {% block content %}
+
+<div id="main">
 	<div id = 'selecteddate'>
-		<form action="/polls/summary/" method="post">
+		<form action="/polls/junglecell/" method="post">
 		{% csrf_token %}
 			{{form}}
 			<input type="submit" value="Go" />  
 		</form>
 	</div>
-	<div id = 'sub'>
-        <h1>{{titleMsg}}</h1> 
+	<div  id = 'sub'>
+		<h1>{{titleMsg}}</h1> 
 		<table table23 cellspacing="1" class="display" id="example3">
 			<thead> 
 			<tr> 
@@ -48,9 +52,9 @@
 			</tr> 
 			</thead>
 			<tbody>
-			{% for rnc in rnc_kpi %} 
+			{% for cell in jcells %} 
 			<tr>
-				{% for item in rnc %}
+				{% for item in cell %}
 				<td> {{ item }}</td>
 				{% endfor %}
 			</tr>
@@ -58,4 +62,5 @@
 			</tbody>
 		</table>
 	</div>
+</div>
 {% endblock %}

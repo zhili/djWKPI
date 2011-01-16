@@ -497,23 +497,34 @@ class DateSelectForm(forms.Form):
         })
     )
 
-class DateRangeSelectForm(forms.Form):        
+class DateRangeSelectForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(DateRangeSelectForm, self).__init__(*args, **kwargs)
+        self.fields['startDate'] = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=5),
+                widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                    'class':'input',
+                    'readonly':'readonly',
+                    'size':'15'
+                })
+            )
 
-    startDate = forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=5),
-        widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
-            'class':'input',
-            'readonly':'readonly',
-            'size':'15'
-        })
-    )
-    endDate = forms.DateField(('%m/%d/%Y',), label='To', required=False, initial=date.today(),
-        widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
-            'class':'input',
-            'readonly':'readonly',
-            'size':'15'
-        })
-    )
-  
+        self.fields['endDate'] = forms.DateField(('%m/%d/%Y',), label='To', required=False, initial=date.today(),
+                widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                    'class':'input',
+                    'readonly':'readonly',
+                    'size':'15'
+                })
+            )
+    def setInitRange(self, days_):
+        if days_:
+            self.fields['startDate'] =  forms.DateField(('%m/%d/%Y',), label='From', required=False, initial=date.today() - timedelta(days=days_),
+                    widget=forms.DateTimeInput(format='%m/%d/%Y', attrs={
+                        'class':'input',
+                        'readonly':'readonly',
+                        'size':'15'
+                    })
+                )
+                
 def changedate(request, ratetype):
     kpi_list = []
     title = 'Not Found'
@@ -724,28 +735,82 @@ def summary_kpi(request, rnc_kpi_list, dateform):
                         'RRC FT', 'RRC SRate']
     return render_to_response('summary.html',  {'titleMsg':title, 'cheads':column_headers, 'rnc_kpi':rnc_kpi, 'form':dateform}, RequestContext(request))
     
-def summary_changedate(request):
-    if request.method == 'POST':
-        dateform = DateSelectForm(request.POST) # A form bound to the POST data
-        if dateform.is_valid():
-            selected_date = dateform.cleaned_data['selectedDate']
-            rnc_kpi_list = KPI.objects.filter(date__range=(selected_date, selected_date+timedelta(days=1))).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
-                                                                                K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
-                                                                                K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
-                                                                                K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
-                                                                                K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
-                                                                                K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
-                                                                                K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b')) # rrc service
-            return summary_kpi(request, rnc_kpi_list, dateform)
 
-def summary(request):
-    dateform = DateSelectForm()
-    rnc_kpi_list = KPI.objects.values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
+def summary(request, sdate = date.today() - timedelta(days=1), edate = date.today() + timedelta(days=1)):
+    dateform = DateRangeSelectForm()
+    dateform.setInitRange(1)
+    if request.method == 'POST':
+        dateform = DateRangeSelectForm(request.POST) # A form bound to the POST data
+        if dateform.is_valid():
+           sdate = dateform.cleaned_data['startDate']
+           edate = dateform.cleaned_data['endDate']
+           if edate - sdate < timedelta (days = 1):
+               temp = edate
+               edate = sdate
+               sdate = temp
+           edate += timedelta(days=1)
+    
+    rnc_kpi_list = KPI.objects.filter(date__range=(sdate, edate)).values('ucell__rnc_id', 'date').annotate(K19_a_sum=Sum('K19_a'), K19_b_sum=Sum('K19_b'), # dcr 
                                                                         K18_a_sum=Sum('K18_a'), K18_b_sum=Sum('K18_b'), # irat
                                                                         K13_2a_sum=Sum('K13_2a'), K13_2b_sum=Sum('K13_2b'), # csrab
                                                                         K12_a_sum=Sum('K12_a'), K12_b_sum=Sum('K12_b'), # ps r99 rab
                                                                         K25_a_sum=Sum('K25_a'), K25_b_sum=Sum('K25_b'), # hd rab
                                                                         K30_a_sum=Sum('K30_a'), K30_b_sum=Sum('K30_b'), # elu rab
                                                                         K08_a_sum=Sum('K08_a'), K08_b_sum=Sum('K08_b') # rrc service
-                                                                        ).order_by('-date')[:8]
+                                                                        ).order_by('-date')
     return summary_kpi(request, rnc_kpi_list, dateform)
+
+
+
+def junglecell(request, sdate = date.today() - timedelta(days=10), edate = date.today() + timedelta(days=1)):
+    dateform = DateRangeSelectForm()
+    if request.method == 'POST':
+        dateform = DateRangeSelectForm(request.POST) # A form bound to the POST data
+        if dateform.is_valid():
+           sdate = dateform.cleaned_data['startDate']
+           edate = dateform.cleaned_data['endDate']
+           if edate - sdate < timedelta (days = 1):
+               temp = edate
+               edate = sdate
+               sdate = temp
+           edate += timedelta(days=1)
+
+    access_fault_list = KPI.objects.filter(date__range=(sdate, edate), K03__gte=0.1).extra(select={'cssr':'K08_a * 1.0 / K08_b * (K13_2a + K12_a) / (K13_2b+K12_b)', 'rab_att':'K13_2b+K12_b'}, where=['K13_2b+K12_b > 20', 'K08_a * 1.0 / K08_b * (K13_2a + K12_a) * 1.0 / (K13_2b+K12_b) < 0.95'])
+    problem_cells = []
+    frequencies = {}
+    for item in access_fault_list:
+        if item.date.hour == 20: # target on the 20:00 kpi
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
+    for cellname in frequencies.keys():
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'accessibility', len(frequencies[cellname]), frequencies[cellname]])
+    frequencies.clear()
+    
+    droppedcall_list = KPI.objects.filter(date__range=(sdate, edate), K03__gte=0.1).extra(select={'dcr':'(K19_a + K20_a) * 1.0 / (K19_b + K20_b)'}, where=['K19_a + K20_a > 2', '(K19_a + K20_a) * 1.0 / (K19_b + K20_b) > 0.03'])
+    for item in droppedcall_list:
+        if item.date.hour == 20: # target on the 20:00 kpi
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
+    for cellname in frequencies.keys():
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'dropped call', len(frequencies[cellname]), frequencies[cellname]])
+    frequencies.clear()
+        
+    irat_ho_list = KPI.objects.filter(date__range=(sdate, edate), K18_b__gt=20).extra(select={'dcr':'K18_a * 1.0 / K18_b'}, where=['K18_a * 1.0 / K18_b <= 0.9'])
+    for item in irat_ho_list:
+        if item.date.hour == 20: # target on the 20:00 kpi
+            if frequencies.has_key(item.ucell.cell_name):
+                frequencies[item.ucell.cell_name].append(item.date.strftime('%m-%d')) 
+            else:
+                frequencies[item.ucell.cell_name]=[item.date.strftime('%m-%d')]
+    for cellname in frequencies.keys():
+        if len(frequencies[cellname]) > 2:
+            problem_cells.append([cellname, 'Irat Ho Failure', len(frequencies[cellname]), frequencies[cellname]])
+    
+    column_headers = ['Cell Name', 'Cause', 'Fault Times', 'Date of Occurrence ']
+    return render_to_response('junglecell.html', {'form':dateform, 'cheads':column_headers, 'jcells':problem_cells}, RequestContext(request))
