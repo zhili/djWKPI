@@ -26,77 +26,54 @@ class UploadFileForm(forms.Form):
 
 def handle_uploaded_file(f):
     try:
-	    reader = csv.reader(f)
-	    header = reader.next()
-	    # print header
-	    hdict = {}
-	    for col in header:
-	         hdict[col] = 0
-	    # print hdict
-	    last_cell_name = ''
-	    for row in reader:
-	        if not row:            	
-	            break
-	        rid= row[0]
-	        cn = row[1]
-	        # get rid of '' to in error
-	        row[5:] = [s if s!='' and s!='#EMPTY' else '0' for s in row[5:]]
-	        if last_cell_name != cn:
-	           # new cell
-	           if last_cell_name != '':
-	              # add the parsed cell's content to db, except for the 1st time
-	              # print 'push db'
-	              if Cell.objects.filter(cell_name=hdict['UCell Name']).exists():
-	                 ucell = Cell.objects.get(cell_name=hdict['UCell Name'])
-	              else:
-	                 ucell = Cell.objects.create(rnc_id=hdict['RNC Id'],cell_name=hdict['UCell Name'])
-	              item_date = datetime.strptime(hdict['Date'], '%m/%d/%Y %I:%M:%S %p') + timedelta(hours=int(hdict['Hour']), minutes=int(hdict['Min']))
-	              kpi = KPI(date = item_date, K01=hdict['K01'], K02=hdict['K02'], K03=hdict['K03'], K04=hdict['K04'], K05=hdict['K05'],
-	                          K08_a = hdict['K08_a'], K08_b = hdict['K08_b'], K09_a = hdict['K09_a'], K09_b = hdict['K09_b'], K10_a=hdict['K10_a'], 
-	                          K10_b=hdict['K10_b'], K11_a=hdict['K11_a'], K11_b=hdict['K11_b'], K12_a=hdict['K12_a'], K12_b=hdict['K12_b'], K13_1a=hdict['K13_1a'], 
-	                          K13_1b=hdict['K13_1b'], K13_2a=hdict['K13_2a'], K13_2b=hdict['K13_2b'], K14_1a=hdict['K14_1a'], K14_1b=hdict['K14_1b'], K15=hdict['K15'], 
-	                          K16_a=hdict['K16_a'], K16_b=hdict['K16_b'], K19_a=hdict['K19_a'], K19_b=hdict['K19_b'], K20_a=hdict['K20_a'], K20_b=hdict['K20_b'], 
-	                          K21_a=hdict['K21_a'], K21_b=hdict['K21_b'], K22_ucell=hdict['K22_ucell'], K24=hdict['K24'], K25_a=hdict['K25_a'], K25_b=hdict['K25_b'],
-	                          K26_a=hdict['K26_a'], K26_b=hdict['K26_b'], K27=hdict['K27'], K29=hdict['K29'], K30_a=hdict['K30_a'], K30_b=hdict['K30_b'], 
-	                          K31_a=hdict['K31_a'], K31_b=hdict['K31_b'], K33_ucell=hdict['K33_ucell'], K34_ucell=hdict['K34_ucell'], K06=hdict['K06'], K28=hdict['K28'],
-	                          K07=hdict['K07'], K23=hdict['K23'], K17_a=hdict['K17_a'], K17_b=hdict['K17_b'], K18_a=hdict['K18_a'], K18_b=hdict['K18_b'], K32_a=hdict['K32_a'], K32_b=hdict['K32_b'])
-	              ucell.kpi_set.add(kpi)
-	           # clear dict content and add to new cell's info to the dict
-	           i = 0
-	           for k in header:
-	                if i > 4:
-	                    hdict[k] = float(row[i])
-	                else:
-		                hdict[k] = row[i]             
-	                i += 1
-	           # print hdict
-	           last_cell_name = cn
-	        else:
-               # sum the data with the same hour
-	           i = 0 # the perf data start with index: 5
-	           for k in header:
-	               if i > 4:
-	                   hdict[k] += float(row[i])
-	               i += 1
+        reader = csv.reader(f)
+        fields = reader.next()
+        cellsSet = {}
+        sum_keys = ['K02', 'K01', 'K03', 'K04', 'K05', 'K08_a', 'K08_b', 'K09_a', 'K09_b', 'K10_a', 'K10_b', 'K11_a', 'K11_b', 'K12_a', 'K12_b', 'K13_1a', 'K13_1b', 'K13_2a', 'K13_2b', 'K14_1a', 'K14_1b', 'K16_a', 'K16_b', 'K19_a', 'K19_b', 'K20_a', 'K20_b', 'K21_a', 'K21_b', 'K24', 'K25_a', 'K25_b', 'K26_a', 'K26_b', 'K27', 'K29', 'K30_a', 'K30_b', 'K31_a', 'K31_b', 'K33_ucell', 'K22_ucell', 'K34_ucell', 'K15', 'K06', 'K28', 'K07', 'K23', 'K17_a', 'K17_b', 'K18_a', 'K18_b', 'K32_a', 'K32_b']
+        
+        for row in reader:
+            items = zip(fields, row)
+            item = {}
+            # Add the value to our dictionary
+            for (name, value) in items:
+                try:
+                    v = float(value.strip())
+                except ValueError:
+                    # string 
+                    if value != '' and value != '#EMPTY':
+                        v = value.strip() 
+                    else:
+                        v = 0
+                item[name] = v
+            if item:
+                if cellsSet.has_key(item['UCell Name']):
+                    new_dict = cellsSet[item['UCell Name']]
+                    for k in sum_keys:
+                        new_dict[k] += item[k]
+                    cellsSet[item['UCell Name']] = new_dict
+                else:
+                    cellsSet[item['UCell Name']] = item         
+        for cell in cellsSet.keys():
+            hdict = cellsSet[cell]
+            if Cell.objects.filter(cell_name=cell).exists():
+                ucell = Cell.objects.get(cell_name=cell)
+            else:
+                ucell = Cell.objects.create(rnc_id=hdict['RNC Id'],cell_name=cell)
+            item_date = datetime.strptime(hdict['Date'], '%m/%d/%Y %I:%M:%S %p') + timedelta(hours=int(hdict['Hour']), minutes=0)
+            kpi = KPI(date = item_date, K01=hdict['K01'], K02=hdict['K02'], K03=hdict['K03'], K04=hdict['K04'], K05=hdict['K05'],
+                      K08_a = hdict['K08_a'], K08_b = hdict['K08_b'], K09_a = hdict['K09_a'], K09_b = hdict['K09_b'], K10_a=hdict['K10_a'], 
+                      K10_b=hdict['K10_b'], K11_a=hdict['K11_a'], K11_b=hdict['K11_b'], K12_a=hdict['K12_a'], K12_b=hdict['K12_b'], K13_1a=hdict['K13_1a'], 
+                      K13_1b=hdict['K13_1b'], K13_2a=hdict['K13_2a'], K13_2b=hdict['K13_2b'], K14_1a=hdict['K14_1a'], K14_1b=hdict['K14_1b'], K15=hdict['K15'], 
+                      K16_a=hdict['K16_a'], K16_b=hdict['K16_b'], K19_a=hdict['K19_a'], K19_b=hdict['K19_b'], K20_a=hdict['K20_a'], K20_b=hdict['K20_b'], 
+                      K21_a=hdict['K21_a'], K21_b=hdict['K21_b'], K22_ucell=hdict['K22_ucell'], K24=hdict['K24'], K25_a=hdict['K25_a'], K25_b=hdict['K25_b'],
+                      K26_a=hdict['K26_a'], K26_b=hdict['K26_b'], K27=hdict['K27'], K29=hdict['K29'], K30_a=hdict['K30_a'], K30_b=hdict['K30_b'], 
+                      K31_a=hdict['K31_a'], K31_b=hdict['K31_b'], K33_ucell=hdict['K33_ucell'], K34_ucell=hdict['K34_ucell'], K06=hdict['K06'], K28=hdict['K28'],
+                      K07=hdict['K07'], K23=hdict['K23'], K17_a=hdict['K17_a'], K17_b=hdict['K17_b'], K18_a=hdict['K18_a'], K18_b=hdict['K18_b'], K32_a=hdict['K32_a'], K32_b=hdict['K32_b'])
+            ucell.kpi_set.add(kpi)
 
     except csv.Error, e:
         # render_to_response('UploadError.html', {'message':'You need to specify a csv file'})
 	    return False
-    if Cell.objects.filter(cell_name=hdict['UCell Name']).exists():
-       ucell = Cell.objects.get(cell_name=hdict['UCell Name'])
-    else:
-       ucell = Cell.objects.create(rnc_id=hdict['RNC Id'],cell_name=hdict['UCell Name'])
-    item_date = datetime.strptime(hdict['Date'], '%m/%d/%Y %I:%M:%S %p') + timedelta(hours=int(hdict['Hour']), minutes=int(hdict['Min']))
-    kpi = KPI(date = item_date, K01=hdict['K01'], K02=hdict['K02'], K03=hdict['K03'], K04=hdict['K04'], K05=hdict['K05'],
-                  K08_a = hdict['K08_a'], K08_b = hdict['K08_b'], K09_a = hdict['K09_a'], K09_b = hdict['K09_b'], K10_a=hdict['K10_a'], 
-                  K10_b=hdict['K10_b'], K11_a=hdict['K11_a'], K11_b=hdict['K11_b'], K12_a=hdict['K12_a'], K12_b=hdict['K12_b'], K13_1a=hdict['K13_1a'], 
-                  K13_1b=hdict['K13_1b'], K13_2a=hdict['K13_2a'], K13_2b=hdict['K13_2b'], K14_1a=hdict['K14_1a'], K14_1b=hdict['K14_1b'], K15=hdict['K15'], 
-                  K16_a=hdict['K16_a'], K16_b=hdict['K16_b'], K19_a=hdict['K19_a'], K19_b=hdict['K19_b'], K20_a=hdict['K20_a'], K20_b=hdict['K20_b'], 
-                  K21_a=hdict['K21_a'], K21_b=hdict['K21_b'], K22_ucell=hdict['K22_ucell'], K24=hdict['K24'], K25_a=hdict['K25_a'], K25_b=hdict['K25_b'],
-                  K26_a=hdict['K26_a'], K26_b=hdict['K26_b'], K27=hdict['K27'], K29=hdict['K29'], K30_a=hdict['K30_a'], K30_b=hdict['K30_b'], 
-                  K31_a=hdict['K31_a'], K31_b=hdict['K31_b'], K33_ucell=hdict['K33_ucell'], K34_ucell=hdict['K34_ucell'], K06=hdict['K06'], K28=hdict['K28'],
-                  K07=hdict['K07'], K23=hdict['K23'], K17_a=hdict['K17_a'], K17_b=hdict['K17_b'], K18_a=hdict['K18_a'], K18_b=hdict['K18_b'], K32_a=hdict['K32_a'], K32_b=hdict['K32_b'])
-    ucell.kpi_set.add(kpi)
     return True
 
 
