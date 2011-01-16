@@ -762,7 +762,7 @@ def summary(request, sdate = date.today() - timedelta(days=1), edate = date.toda
 
 
 
-def junglecell(request, sdate = date.today() - timedelta(days=10), edate = date.today() + timedelta(days=1)):
+def junglecell(request, sdate = date.today() - timedelta(days=7), edate = date.today() + timedelta(days=1)):
     dateform = DateRangeSelectForm()
     if request.method == 'POST':
         dateform = DateRangeSelectForm(request.POST) # A form bound to the POST data
